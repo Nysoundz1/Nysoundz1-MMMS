@@ -1,0 +1,19 @@
+{
+  "name": "mass-music-management-system",
+  "version": "1.0.0",
+  "description": "Mass Music Management System (MMMS) for Catholic high schools and parishes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "catholic-mass",
+    "liturgical-music",
+    "choir-management",
+    "song-library",
+    "chord-transposer"
+  ],
+  "author": "OLAG SHS Sacred Music Ministry",
+  "license": "MIT"
+}

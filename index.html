@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OLAG &bull; School Mass Music Management System (SMMMS)</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Left Navigation Sidebar -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.jpg" alt="OLAG SHS Crest" class="school-crest-img">
+        <div class="brand-text">
+          <h1>SMMMS</h1>
+          <span>OLAG &bull; Mass Music Management</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-nav="dashboard" id="nav-dashboard">
+          <span class="nav-item-icon">🏠</span>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-nav="schedule" id="nav-schedule">
+          <span class="nav-item-icon">📅</span>
+          <span>Mass Schedule</span>
+        </a>
+        <a class="nav-item" data-nav="arrangement" id="nav-arrangement">
+          <span class="nav-item-icon">🎼</span>
+          <span>Mass Arrangement</span>
+        </a>
+        <a class="nav-item" data-nav="library" id="nav-library">
+          <span class="nav-item-icon">🎵</span>
+          <span>Song Library</span>
+        </a>
+        <a class="nav-item" data-nav="groups" id="nav-groups">
+          <span class="nav-item-icon">👥</span>
+          <span>Music Groups</span>
+        </a>
+        <a class="nav-item" data-nav="approvals" id="nav-approvals">
+          <span class="nav-item-icon">✅</span>
+          <span>Approval Requests</span>
+          <span class="nav-badge" id="nav-approvals-badge">1</span>
+        </a>
+        <a class="nav-item" data-nav="archive" id="nav-archive">
+          <span class="nav-item-icon">📁</span>
+          <span>Archive</span>
+        </a>
+        <a class="nav-item" data-nav="settings" id="nav-settings">
+          <span class="nav-item-icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p class="sidebar-quote">"Let everything that has breath praise the Lord"</p>
+        <p class="sidebar-quote-verse">Psalm 150:6</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Top Header Bar -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle Menu">
+            ☰
+          </button>
+          <h2 class="header-title" id="page-header-title">Dashboard</h2>
+        </div>
+
+        <div class="header-actions">
+          <!-- Toggle iPhone Mockup Preview -->
+          <button class="btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" id="toggle-phone-mockup-btn" title="Toggle interactive phone mockup preview">
+            <span>📱</span> Phone View
+          </button>
+
+          <!-- Notification Bell -->
+          <button class="btn-icon-nav" aria-label="Notifications" onclick="app.showToast('Notification: 1 Mass arrangement awaiting review.', 'info')">
+            🔔
+            <span class="notification-dot"></span>
+          </button>
+
+          <!-- User Profile & Role Switcher -->
+          <div class="user-profile-menu">
+            <img src="assets/avatar.jpg" alt="Faith Mensah" class="user-avatar-img">
+            <div>
+              <div class="user-meta-name" id="user-display-name">Faith Mensah</div>
+              <select class="role-select-inline" id="user-role-select" title="Switch User Role">
+                <option value="group">Music Group Member</option>
+                <option value="coordinator">Music Coordinator</option>
+                <option value="chaplain">Priest / Chaplain</option>
+                <option value="student">Student / Member</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ============================================== -->
+      <!-- MODULE 1: DASHBOARD -->
+      <!-- ============================================== -->
+      <section class="view-section active" id="view-dashboard">
+        <div class="greeting-section">
+          <h1 class="greeting-title">Good evening, Faith! 👋</h1>
+          <p class="greeting-subtitle">Here's what's happening with the Mass music today.</p>
+        </div>
+
+        <!-- 4 Top Stat Cards -->
+        <div class="dash-stats-row">
+          <div class="stat-item-card" onclick="app.navigateTo('schedule')" style="cursor: pointer;">
+            <div class="stat-icon-box stat-icon-blue">📅</div>
+            <div class="stat-content-meta">
+              <span class="stat-label-badge">Upcoming Mass</span>
+              <div class="stat-main-value" id="dash-upcoming-mass-date">Sun, 25 May 2025</div>
+              <span class="stat-subtext">7:00 AM &bull; School Chapel</span>
+            </div>
+          </div>
+
+          <div class="stat-item-card" onclick="app.navigateTo('arrangement')" style="cursor: pointer;">
+            <div class="stat-icon-box stat-icon-green">🎵</div>
+            <div class="stat-content-meta">
+              <span class="stat-label-badge">Today's Arrangement</span>
+              <div class="stat-main-value" id="dash-today-arr-title">Easter Sunday</div>
+              <span class="stat-subtext">School Choir</span>
+            </div>
+          </div>
+
+          <div class="stat-item-card" onclick="app.navigateTo('approvals')" style="cursor: pointer;">
+            <div class="stat-icon-box stat-icon-orange">📄</div>
+            <div class="stat-content-meta">
+              <span class="stat-label-badge">Pending Submissions</span>
+              <div class="stat-main-value" id="dash-pending-count">1</div>
+              <span class="stat-subtext">Awaiting review</span>
+            </div>
+          </div>
+
+          <div class="stat-item-card" onclick="app.navigateTo('library')" style="cursor: pointer;">
+            <div class="stat-icon-box stat-icon-purple">🎼</div>
+            <div class="stat-content-meta">
+              <span class="stat-label-badge">Recently Added Songs</span>
+              <div class="stat-main-value" id="dash-songs-count">3</div>
+              <span class="stat-subtext">This week</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Major Panels Row -->
+        <div class="dash-panels-row">
+          <!-- Left: Next Mass Panel -->
+          <div class="dash-panel-card">
+            <div class="panel-header-row">
+              <h3 class="panel-header-title">Next Mass</h3>
+              <a class="panel-link-action" onclick="app.navigateTo('schedule')">View All</a>
+            </div>
+
+            <div class="next-mass-content">
+              <img src="assets/chalice.jpg" alt="Easter Sunday Mass Chalice" class="next-mass-thumb-img">
+              <div class="next-mass-details">
+                <div>
+                  <h4 class="next-mass-name">Easter Sunday</h4>
+                  <div class="next-mass-metadata">
+                    <div>👤 <strong>Celebrant:</strong> Fr. Emmanuel K. Aidoo</div>
+                    <div>👥 <strong>Music Group:</strong> School Choir</div>
+                    <div>🏛️ <strong>Venue:</strong> School Chapel</div>
+                    <div>🌿 <strong>Liturgical Season:</strong> Easter</div>
+                  </div>
+                </div>
+                <div class="next-mass-status-badge">
+                  <span class="badge-pill badge-green" id="dash-next-mass-status">Arrangement Approved</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Today's Arrangement (Preview) -->
+          <div class="dash-panel-card">
+            <div class="panel-header-row">
+              <h3 class="panel-header-title">Today's Arrangement <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">(Preview)</span></h3>
+              <a class="panel-link-action" onclick="app.navigateTo('arrangement')">View Full Arrangement</a>
+            </div>
+
+            <div class="arrangement-preview-list" id="dash-preview-parts-list">
+              <!-- Dynamically populated -->
+            </div>
+
+            <a class="view-all-parts-link" onclick="app.navigateTo('arrangement')">
+              View All Parts &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Reminder Banner -->
+        <div class="reminder-banner">
+          <span style="font-size: 1.1rem;">ℹ️</span>
+          <span><strong>Reminder:</strong> Please submit your arrangements at least 2 days before the Mass for review.</span>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- MODULE 2: MASS SCHEDULE -->
+      <!-- ============================================== -->
+      <section class="view-section" id="view-schedule">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">Mass Schedule</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">Manage Mass celebrations, dates, occasions, celebrants, venues, and assigned music groups.</p>
+          </div>
+          <!-- Coordinator Creates Mass & Assigns Music Group -->
+          <button class="btn-primary" onclick="app.openCreateMassModal()">
+            <span>➕</span> Create Mass & Assign Group
+          </button>
+        </div>
+
+        <div class="schedule-container">
+          <!-- Calendar Month Widget -->
+          <div class="calendar-widget-card">
+            <div class="calendar-widget-header">
+              <div class="cal-month-nav">
+                <button class="cal-nav-arrow" onclick="app.prevMonth()">&larr;</button>
+                <span id="cal-month-year-label">May 2025</span>
+                <button class="cal-nav-arrow" onclick="app.nextMonth()">&rarr;</button>
+              </div>
+              <button class="cal-today-btn" onclick="app.goToMay2025()">Today</button>
+            </div>
+
+            <table class="calendar-grid-table">
+              <thead>
+                <tr>
+                  <th>Sun</th>
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th>Sat</th>
+                </tr>
+              </thead>
+              <tbody id="calendar-days-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Upcoming Masses List Below Calendar -->
+          <div class="upcoming-masses-card">
+            <div class="panel-header-row" style="margin-bottom: 0.75rem;">
+              <h3 class="panel-header-title">Scheduled Masses</h3>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">Click any Mass to inspect details or arrangement</span>
+            </div>
+
+            <div id="upcoming-masses-list-container">
+              <!-- Dynamically populated from store.getMasses() -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- MODULE 3: MASS ARRANGEMENT (13 PARTS) -->
+      <!-- ============================================== -->
+      <section class="view-section" id="view-arrangement">
+        <div class="arrangement-top-bar" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+          <button class="back-link-btn" onclick="app.navigateTo('dashboard')">
+            &larr; Mass Arrangement
+          </button>
+
+          <!-- Mass Selector Dropdown -->
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Select Mass:</label>
+            <select class="filter-select" id="arrangement-mass-selector" onchange="app.switchActiveMassArrangement(this.value)">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Meta Bar -->
+        <div class="arrangement-meta-strip" id="arrangement-meta-strip-container">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- 13 Liturgical Steps Table -->
+        <div class="parts-table-card" id="arrangement-13-parts-container">
+          <!-- Dynamically populated with all 13 parts -->
+        </div>
+
+        <!-- Bottom Action Buttons -->
+        <div class="arrangement-actions-bottom" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn-primary" id="btn-submit-arrangement" onclick="app.submitCurrentArrangement()">
+            Submit for Review
+          </button>
+          <button class="btn-outline" onclick="app.showToast('Arrangement draft saved.', 'info')">
+            Save as Draft
+          </button>
+          <button class="btn-outline" onclick="app.copyWhatsAppSummary(app.activeArrangementId)">
+            📱 Copy WhatsApp Text
+          </button>
+          <button class="btn-outline" onclick="app.printCurrentProgramme()" style="margin-left: auto;">
+            🖨️ Print Final Programme
+          </button>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- MODULE 4: SONG LIBRARY -->
+      <!-- ============================================== -->
+      <section class="view-section" id="view-library">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">🎵 Song Library</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">Catholic hymns, ordinaries, chords, transposer, PDF scores, and audio references.</p>
+          </div>
+          <button class="btn-primary" onclick="app.openAddSongModal()">
+            + Add Song
+          </button>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="library-filters-row">
+          <input type="text" class="search-box-input" id="song-search-input" placeholder="Search by title, composer, or keyword..." oninput="app.filterSongsTable(this.value)">
+
+          <select class="filter-select" id="filter-cat-select" onchange="app.filterSongsTable()">
+            <option value="all">All Categories</option>
+            <option value="Easter">Easter</option>
+            <option value="Penitential">Penitential</option>
+            <option value="Gloria">Gloria</option>
+            <option value="Psalm">Psalm</option>
+            <option value="Acclamation">Acclamation</option>
+            <option value="Offertory">Offertory</option>
+            <option value="Sanctus">Sanctus</option>
+            <option value="Memorial">Memorial</option>
+            <option value="Amen">Amen</option>
+            <option value="Agnus Dei">Agnus Dei</option>
+            <option value="Communion">Communion</option>
+            <option value="Thanksgiving">Thanksgiving</option>
+            <option value="Recessional">Recessional</option>
+          </select>
+
+          <select class="filter-select" id="filter-key-select" onchange="app.filterSongsTable()">
+            <option value="all">All Keys</option>
+            <option value="G">Key G</option>
+            <option value="D">Key D</option>
+            <option value="F">Key F</option>
+            <option value="C">Key C</option>
+            <option value="Eb">Key Eb</option>
+          </select>
+
+          <select class="filter-select" id="filter-timesig-select" onchange="app.filterSongsTable()">
+            <option value="all">All Time Signatures</option>
+            <option value="4/4">4/4</option>
+            <option value="3/4">3/4</option>
+            <option value="6/8">6/8</option>
+          </select>
+
+          <select class="filter-select" id="filter-group-select" onchange="app.filterSongsTable()">
+            <option value="all">All Groups</option>
+            <option value="School Choir">School Choir</option>
+            <option value="Youth Choir">Youth Choir</option>
+            <option value="Chapel Choir">Chapel Choir</option>
+            <option value="Inspirational Band Ministry">Inspirational Band</option>
+          </select>
+        </div>
+
+        <!-- Songs Data Table -->
+        <div class="data-table-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Composer</th>
+                <th>Key</th>
+                <th>Time Sig.</th>
+                <th>Tempo</th>
+                <th>Category</th>
+                <th style="text-align: right;">Score & Chords</th>
+              </tr>
+            </thead>
+            <tbody id="songs-table-tbody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+
+          <div class="table-pagination">
+            <span id="pagination-info-text">Showing 1 - 8 of 48 songs</span>
+            <div class="pagination-controls">
+              <button class="page-btn">&larr;</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">4</button>
+              <button class="page-btn">5</button>
+              <button class="page-btn">&rarr;</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- MODULE 5: MUSIC GROUPS -->
+      <!-- ============================================== -->
+      <section class="view-section" id="view-groups">
+        <div style="margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.25rem; font-weight: 800;">👥 School Music Groups</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Profiles, members, rehearsals, assigned Masses, and arrangements repertoire.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;" id="groups-list-container">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- MODULE 6: APPROVAL SYSTEM (COORDINATOR) -->
+      <!-- ============================================== -->
+      <section class="view-section" id="view-approvals">
+        <div style="margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.25rem; font-weight: 800;">✅ Coordinator Review & Approvals</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Workflow pipeline: <strong>Draft &rarr; Submitted &rarr; Reviewed &rarr; Approved</strong>. The Coordinator can make corrections to any hymn before approving.</p>
+        </div>
+
+        <div id="approvals-cards-container">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- MODULE 7: ARCHIVE -->
+      <!-- ============================================== -->
+      <section class="view-section" id="view-archive">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">📁 Mass Music Archive</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Search previous Masses, reuse arrangements for upcoming Masses, or print final programmes.</p>
+          </div>
+          <div>
+            <input type="text" class="search-box-input" id="archive-search-input" placeholder="Search past Masses by occasion or year..." oninput="app.filterArchive(this.value)" style="width: 280px;">
+          </div>
+        </div>
+
+        <div class="data-table-card" style="padding: 1.25rem;" id="archive-list-container">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SETTINGS -->
+      <!-- ============================================== -->
+      <section class="view-section" id="view-settings">
+        <div style="margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.25rem; font-weight: 800;">⚙️ System Settings</h2>
+        </div>
+        <div class="dash-panel-card" style="max-width: 600px;">
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">School & Liturgical Configuration</h3>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">School Name</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" value="Our Lady of Grace Senior High School (OLAG SHS)">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Current Liturgical Year</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" value="Year C / 2025-2026">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Default Venue</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" value="St. Thomas Aquinas School Chapel">
+            </div>
+            <div style="margin-top: 0.5rem; display: flex; gap: 0.75rem;">
+              <button class="btn-primary" onclick="app.showToast('Settings saved successfully.', 'success')">Save Settings</button>
+              <button class="btn-outline" onclick="app.resetDemoData()">Reset Demo Data</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: COORDINATOR CREATES MASS & ASSIGNS GROUP -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="create-mass-modal">
+    <div class="modal-box-card" style="max-width: 580px;">
+      <button class="modal-close-icon" onclick="app.closeCreateMassModal()">&times;</button>
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;">📅 Create Mass Celebration & Assign Music Group</h3>
+      <form id="create-mass-form" onsubmit="app.handleCreateMassSubmit(event)">
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Date *</label>
+              <input type="date" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-mass-date" required value="2025-06-22">
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Time *</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-mass-time" required value="7:00 AM">
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Occasion / Mass Theme *</label>
+            <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-mass-theme" required placeholder="e.g. 12th Sunday in Ordinary Time / Feast of St. Aloysius Gonzaga">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Liturgical Season *</label>
+              <select class="filter-select" style="width: 100%; margin-top: 0.25rem;" id="new-mass-season">
+                <option value="ordinary">🌿 Ordinary Time</option>
+                <option value="easter">🌅 Easter</option>
+                <option value="solemnity">👑 Solemnity / Feast</option>
+                <option value="advent">🕯️ Advent</option>
+                <option value="lent">✝️ Lent</option>
+                <option value="christmas">⭐ Christmas</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Assign Music Group *</label>
+              <select class="filter-select" style="width: 100%; margin-top: 0.25rem;" id="new-mass-group" required>
+                <option value="grp-school-choir">School Choir</option>
+                <option value="grp-youth-choir">Youth Choir</option>
+                <option value="grp-chapel-choir">Chapel Choir</option>
+                <option value="grp-inspirational-band">Inspirational Band Ministry</option>
+                <option value="grp-cantors">Cantors & Soloists Guild</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Celebrant *</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-mass-celebrant" required value="Fr. Emmanuel K. Aidoo">
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Venue *</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-mass-venue" required value="School Chapel">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1rem;">
+            <button type="button" class="btn-outline" onclick="app.closeCreateMassModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Create Mass & Notify Group</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: REUSE ARRANGEMENT (ARCHIVE) -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="reuse-arrangement-modal">
+    <div class="modal-box-card" style="max-width: 520px;">
+      <button class="modal-close-icon" onclick="app.closeReuseModal()">&times;</button>
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem;">🔄 Reuse Past Music Arrangement</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Copy all 13 song selections from <strong id="reuse-source-title" style="color: var(--text-main);"></strong> into an upcoming Mass.
+      </p>
+
+      <form id="reuse-arrangement-form" onsubmit="app.handleReuseArrangementSubmit(event)">
+        <input type="hidden" id="reuse-source-arr-id">
+        <div style="margin-bottom: 1.25rem;">
+          <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Select Target Upcoming Mass *</label>
+          <select class="filter-select" style="width: 100%; margin-top: 0.25rem;" id="reuse-target-mass-id" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.65rem;">
+          <button type="button" class="btn-outline" onclick="app.closeReuseModal()">Cancel</button>
+          <button type="submit" class="btn-primary">Apply & Load Arrangement</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: MASS DETAILS MODAL -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="mass-details-modal">
+    <div class="modal-box-card">
+      <button class="modal-close-icon" onclick="app.closeMassDetailsModal()">&times;</button>
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.25rem;" id="modal-mass-header-date">Mass Details – May 25, 2025</h3>
+
+      <div class="next-mass-content" style="margin-bottom: 1.5rem;">
+        <img src="assets/chalice.jpg" alt="Chalice" class="next-mass-thumb-img" style="width: 100px; height: 100px;">
+        <div class="next-mass-details">
+          <div>
+            <h4 class="next-mass-name" id="modal-mass-theme">Easter Sunday</h4>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;" id="modal-mass-time-venue">7:00 AM &bull; School Chapel</div>
+            <div class="next-mass-metadata" style="margin-top: 0.5rem;">
+              <div>👤 <strong>Celebrant:</strong> <span id="modal-mass-celebrant">Fr. Emmanuel K. Aidoo</span></div>
+              <div>👥 <strong>Music Group:</strong> <span id="modal-mass-group">School Choir</span></div>
+              <div>🌿 <strong>Liturgical Season:</strong> <span id="modal-mass-season">Easter</span></div>
+            </div>
+          </div>
+          <div style="margin-top: 0.75rem;">
+            <span class="badge-pill badge-green" id="modal-mass-badge">Arrangement Approved</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button class="btn-outline" onclick="app.closeMassDetailsModal()">Close</button>
+        <button class="btn-primary" id="modal-view-arrangement-btn" onclick="app.openArrangementFromModal()">View Arrangement</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: ADD HYMN TO SONG LIBRARY -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="add-song-modal">
+    <div class="modal-box-card" style="max-width: 580px;">
+      <button class="modal-close-icon" onclick="app.closeAddSongModal()">&times;</button>
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;">➕ Add Hymn to Song Library</h3>
+      <form id="add-song-form" onsubmit="app.handleAddSongSubmit(event)">
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Song Title *</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-song-title" required placeholder="e.g. As the Deer">
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Composer / Author</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-song-composer" placeholder="e.g. Martin Nystrom">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Category *</label>
+              <select class="filter-select" style="width: 100%; margin-top: 0.25rem;" id="new-song-category">
+                <option value="Entrance">Entrance</option>
+                <option value="Penitential">Penitential</option>
+                <option value="Gloria">Gloria</option>
+                <option value="Psalm">Psalm</option>
+                <option value="Acclamation">Acclamation</option>
+                <option value="Offertory">Offertory</option>
+                <option value="Sanctus">Sanctus</option>
+                <option value="Memorial">Memorial</option>
+                <option value="Amen">Amen</option>
+                <option value="Agnus Dei">Agnus Dei</option>
+                <option value="Communion">Communion</option>
+                <option value="Thanksgiving">Thanksgiving</option>
+                <option value="Recessional">Recessional</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Original Key *</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-song-key" value="D" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Time Signature</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-song-timesig" value="4/4">
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Tempo (BPM)</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="new-song-tempo" value="96">
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Chords & Lyrics (Transposable)</label>
+            <textarea class="search-box-input" style="width: 100%; margin-top: 0.25rem; font-family: var(--font-mono); font-size: 0.8rem;" rows="5" id="new-song-chords" placeholder="[Verse 1]&#10;D        A       Bm&#10;As the deer panteth for the water..."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1rem;">
+            <button type="button" class="btn-outline" onclick="app.closeAddSongModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Save Hymn to Library</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: EDIT HYMN IN ARRANGEMENT -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="part-edit-modal">
+    <div class="modal-box-card" style="max-width: 520px;">
+      <button class="modal-close-icon" onclick="app.closePartEditModal()">&times;</button>
+      <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;" id="part-edit-modal-title">Edit Hymn</h3>
+      <form id="part-edit-form" onsubmit="app.handleSavePartEdit(event)">
+        <input type="hidden" id="edit-part-id">
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Select from Library</label>
+            <select class="filter-select" style="width: 100%; margin-top: 0.25rem;" id="edit-pick-library-select" onchange="app.handleLibraryHymnSelect(this.value)">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Or Type Song Title *</label>
+            <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="edit-song-title" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Key Signature</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="edit-song-key" value="G">
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Time Signature</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="edit-song-timesig" value="4/4">
+            </div>
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Tempo (BPM)</label>
+            <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="edit-song-tempo" value="120">
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1rem;">
+            <button type="button" class="btn-outline" onclick="app.closePartEditModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CHORDS, TRANSPOSER & AUDIO -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="chord-viewer-modal">
+    <div class="modal-box-card" style="max-width: 650px;">
+      <button class="modal-close-icon" onclick="app.closeChordModal()">&times;</button>
+      <div id="chord-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- FLOATING IPHONE PREVIEW FRAME (From Ref) -->
+  <!-- ============================================== -->
+  <div class="phone-mockup-floating" id="phone-mockup-floating">
+    <div class="iphone-inner-screen">
+      <!-- Status Bar -->
+      <div class="iphone-notch-bar">
+        <span>9:41</span>
+        <div class="iphone-notch"></div>
+        <span>📶 🔋</span>
+      </div>
+
+      <!-- Mobile Content Scrollable -->
+      <div style="padding: 1rem 1.15rem 4rem; flex: 1;" id="iphone-mockup-content">
+        <!-- Rendered dynamically matching phone view -->
+      </div>
+
+      <!-- Mobile Bottom Nav -->
+      <div class="iphone-bottom-nav">
+        <div class="iphone-nav-item active" onclick="app.navigateTo('dashboard')">
+          <span style="font-size: 1rem;">🏠</span>
+          <span>Home</span>
+        </div>
+        <div class="iphone-nav-item" onclick="app.navigateTo('schedule')">
+          <span style="font-size: 1rem;">📅</span>
+          <span>Masses</span>
+        </div>
+        <div class="iphone-nav-item" onclick="app.navigateTo('arrangement')">
+          <span style="font-size: 1rem;">🎼</span>
+          <span>Music</span>
+        </div>
+        <div class="iphone-nav-item" onclick="app.navigateTo('groups')">
+          <span style="font-size: 1rem;">👥</span>
+          <span>Groups</span>
+        </div>
+        <div class="iphone-nav-item" onclick="app.navigateTo('library')">
+          <span style="font-size: 1rem;">⋯</span>
+          <span>More</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Core Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
