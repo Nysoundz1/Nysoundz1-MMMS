@@ -173,7 +173,7 @@ html, body {
   gap: 0.75rem;
   padding: 0.65rem 0.95rem;
   border-radius: var(--radius-md);
-  color: var(--sidebar-text);
+  color: #cbd5e1;
   font-size: 0.85rem;
   font-weight: 500;
   text-decoration: none;
@@ -209,11 +209,13 @@ html, body {
   font-weight: 700;
   padding: 0.1rem 0.45rem;
   border-radius: var(--radius-full);
+}
+
 .sidebar-section-title {
-  padding: 0.75rem 1rem 0.25rem;
-  font-size: 0.65rem;
+  padding: 0.85rem 1rem 0.35rem;
+  font-size: 0.68rem;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.4);
+  color: #94a3b8;
   letter-spacing: 0.75px;
   text-transform: uppercase;
 }
@@ -334,11 +336,17 @@ html, body {
 }
 
 .user-avatar-img {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  object-fit: cover;
+  width: 34px !important;
+  height: 34px !important;
+  max-width: 34px !important;
+  max-height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
   border: 1px solid var(--border-color);
+  flex-shrink: 0;
+  display: block;
 }
 
 .user-meta-name {
@@ -1840,7 +1848,6 @@ html, body {
   .top-header,
   .arrangement-top-bar,
   .arrangement-actions-bottom,
-  .phone-mockup-floating,
   .toast-container,
   .modal-overlay,
   .view-section:not(#view-arrangement),
