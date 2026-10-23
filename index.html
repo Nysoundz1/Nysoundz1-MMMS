@@ -114,6 +114,23 @@
       <!-- MODULE 1: DYNAMIC ROLE-BASED DASHBOARD -->
       <!-- ============================================== -->
       <section class="view-section active" id="view-dashboard">
+        <!-- Standalone Dashboard Pages Bar -->
+        <div style="background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(8px); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 0.75rem 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.1rem;">📂</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-primary);">Dedicated Dashboard Files:</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);">(Admin approval enforced for each role)</span>
+          </div>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <a href="chaplain.html" class="btn btn-sm btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">✝️ Chaplain (chaplain.html)</a>
+            <a href="coordinator.html" class="btn btn-sm btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">🎼 Coordinator (coordinator.html)</a>
+            <a href="group.html" class="btn btn-sm btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">🎵 Chorister (group.html)</a>
+            <a href="admin.html" class="btn btn-sm btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; border-color: #f59e0b; color: #f59e0b;">🛡️ Admin Approvals (admin.html)</a>
+            <a href="pending.html" class="btn btn-sm btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; color: #ef4444;">⏳ Pending Lock Gate (pending.html)</a>
+            <a href="login.html" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">🔑 Sign In (login.html)</a>
+          </div>
+        </div>
+
         <div id="dashboard-dynamic-content">
           <!-- Dynamically populated by app.renderDashboard() according to user role and approval status -->
         </div>

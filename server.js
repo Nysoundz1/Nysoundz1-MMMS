@@ -49,9 +49,14 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      // Fallback to index.html if it's a SPA route or 404
+      // Check if an .html file matches this route (clean URLs like /login, /chaplain)
       if (!path.extname(safePath)) {
-        filePath = path.join(ROOT, 'index.html');
+        const htmlPath = path.join(ROOT, safePath + '.html');
+        if (fs.existsSync(htmlPath)) {
+          filePath = htmlPath;
+        } else {
+          filePath = path.join(ROOT, 'index.html');
+        }
       } else {
         res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         res.end('404 Not Found');

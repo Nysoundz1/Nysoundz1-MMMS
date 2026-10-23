@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Account Under Review &bull; OLAG SMMMS</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: radial-gradient(circle at top center, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+      min-height: 100vh;
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pending Gate Dynamic Container -->
+  <div id="pending-gate-container">
+    <div style="text-align: center; padding: 4rem 1rem;">
+      <div style="font-size: 2.5rem; animation: pulse 1.5s infinite;">⏳</div>
+      <p style="margin-top: 1rem; color: var(--color-text-muted);">Verifying Account Authorization Status...</p>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboards/pending-gate.js"></script>
+</body>
+</html>

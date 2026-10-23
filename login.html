@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sign In &bull; OLAG School Mass Music Management System</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 960px;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    @media (max-width: 820px) {
+      .auth-container {
+        grid-template-columns: 1fr;
+      }
+      .auth-brand-side {
+        display: none;
+      }
+    }
+    .auth-brand-side {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.25) 0%, rgba(15, 23, 42, 0.8) 100%);
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+    .auth-brand-side::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('assets/logo.jpg') center/cover no-repeat;
+      opacity: 0.04;
+      pointer-events: none;
+    }
+    .auth-form-side {
+      padding: 2.75rem 2.5rem;
+      background: var(--color-bg-primary);
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--color-bg-secondary);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.75rem;
+      border: 1px solid var(--color-border);
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 0.65rem;
+      text-align: center;
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: calc(var(--radius-md) - 2px);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .auth-tab-btn.active {
+      background: var(--color-surface);
+      color: var(--color-primary);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .persona-card {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+    .persona-card:hover {
+      border-color: var(--color-primary);
+      background: rgba(99, 102, 241, 0.06);
+      transform: translateX(4px);
+    }
+    .persona-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--color-border);
+    }
+    .persona-info {
+      flex: 1;
+    }
+    .persona-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .persona-role {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <!-- Brand Sidebar -->
+    <div class="auth-brand-side">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <img src="assets/logo.jpg" alt="OLAG Logo" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(255,255,255,0.2);">
+          <div>
+            <h2 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: #fff;">OLAG SMMMS</h2>
+            <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">School Mass Music</span>
+          </div>
+        </div>
+
+        <h3 style="font-size: 1.5rem; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 0.75rem;">
+          Catholic Liturgical Order & Choral Harmony
+        </h3>
+        <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;">
+          Welcome to Our Lady of Grace Senior High School Mass Music Management System.
+          Our liturgical platform enforces individual administrative approval for all chaplains, coordinators, and choristers.
+        </p>
+
+        <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.25rem; margin-top: 1rem;">
+          <div style="font-size: 0.8rem; font-weight: 600; color: #fbbf24; text-transform: uppercase; margin-bottom: 0.5rem;">
+            🛡️ Administrative Access Gate
+          </div>
+          <p style="font-size: 0.8rem; color: #e2e8f0; margin: 0; line-height: 1.5;">
+            "New accounts are placed into a pending verification queue. The System Administrator inspects every registration before granting access to mass schedules, hymn scores, and rehearsals."
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; color: #94a3b8; font-size: 0.8rem;">
+        <em>Ut In Omnibus Glorificetur Deus</em> &bull; Psalm 150:6
+      </div>
+    </div>
+
+    <!-- Auth Forms & Demo Shortcuts -->
+    <div class="auth-form-side">
+      <!-- Tabs: Sign In / Register / Demo Personas -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tab-btn-login" onclick="showAuthTab('login')">
+          Sign In
+        </button>
+        <button class="auth-tab-btn" id="tab-btn-register" onclick="showAuthTab('register')">
+          Register Account
+        </button>
+        <button class="auth-tab-btn" id="tab-btn-demo" onclick="showAuthTab('demo')">
+          ⚡ 1-Click Personas
+        </button>
+      </div>
+
+      <!-- 1. SIGN IN FORM -->
+      <div id="auth-pane-login">
+        <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 0.25rem;">Welcome back</h2>
+        <p style="color: var(--color-text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">
+          Sign in to access your liturgical dashboard
+        </p>
+
+        <form onsubmit="handleFormLogin(event)">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Email Address</label>
+            <input type="email" id="login-email" class="form-control" placeholder="e.g., chaplain@olagshs.edu.gh" required value="chaplain@olagshs.edu.gh" />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" style="font-weight: 600; font-size: 0.85rem; margin: 0;">Password</label>
+              <a href="#" onclick="alert('For demo purposes, all accounts are unlocked without a password. Choose your persona below.'); return false;" style="font-size: 0.75rem; color: var(--color-primary);">Forgot password?</a>
+            </div>
+            <input type="password" id="login-password" class="form-control" placeholder="••••••••" value="demo1234" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.95rem;">
+            Sign In to Dashboard →
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--color-text-muted);">
+          New to OLAG SMMMS?
+          <a href="#" onclick="showAuthTab('register'); return false;" style="color: var(--color-primary); font-weight: 600;">Register new account</a>
+        </div>
+      </div>
+
+      <!-- 2. REGISTER FORM -->
+      <div id="auth-pane-register" style="display: none;">
+        <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 0.25rem;">Create an Account</h2>
+        <p style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+          Account will be submitted to Sr. Beatrice Osei for administrative approval
+        </p>
+
+        <form onsubmit="handleFormRegister(event)">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 600; font-size: 0.8rem;">Full Name *</label>
+            <input type="text" id="reg-name" class="form-control" placeholder="e.g., Sister Maria Goretti" required />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 600; font-size: 0.8rem;">Email Address *</label>
+            <input type="email" id="reg-email" class="form-control" placeholder="e.g., maria@olagshs.edu.gh" required />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600; font-size: 0.8rem;">Requested Role *</label>
+              <select id="reg-role" class="form-control" required>
+                <option value="group">Music Group Member (Chorister)</option>
+                <option value="coordinator">Music Coordinator</option>
+                <option value="chaplain">Chaplain / Priest Celebrant</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600; font-size: 0.8rem;">Choir / Ministry *</label>
+              <select id="reg-group" class="form-control" required>
+                <option value="Marian Voices">Marian Voices</option>
+                <option value="St. Cecilia Choir">St. Cecilia Choir</option>
+                <option value="Holy Family Youth Choir">Holy Family Youth Choir</option>
+                <option value="Chaplaincy Team">Chaplaincy Team</option>
+                <option value="Music Directorate">Music Directorate</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 600; font-size: 0.8rem;">Voice Part</label>
+            <select id="reg-voice" class="form-control">
+              <option value="Soprano">Soprano</option>
+              <option value="Alto">Alto</option>
+              <option value="Tenor">Tenor</option>
+              <option value="Bass">Bass</option>
+              <option value="Cantor">Cantor</option>
+              <option value="Organist">Organist / Accompanist</option>
+              <option value="Member">General Chorister</option>
+            </select>
+          </div>
+
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem;">
+            <div style="font-size: 0.75rem; color: #b45309; font-weight: 600;">⏳ Strict Admin Approval Notice:</div>
+            <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.2rem;">
+              Your account will be saved with <strong>Status: Pending</strong>. You will be placed on the verification holding gate until Sr. Beatrice approves your profile.
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">
+            Submit Account for Admin Approval →
+          </button>
+        </form>
+      </div>
+
+      <!-- 3. ONE-CLICK PERSONAS -->
+      <div id="auth-pane-demo" style="display: none;">
+        <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 0.25rem;">⚡ 1-Click Persona Demo Sign-in</h2>
+        <p style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+          Instant access to evaluate each role's distinct dashboard and features
+        </p>
+
+        <!-- Chaplain Persona -->
+        <div class="persona-card" onclick="auth.loginWithUserId('usr-002')">
+          <img src="assets/avatar.jpg" alt="Fr. Aidoo" class="persona-avatar">
+          <div class="persona-info">
+            <div class="persona-name">
+              <span>Fr. Emmanuel K. Aidoo</span>
+              <span class="badge-pill badge-purple" style="font-size: 0.65rem;">✝️ Chaplain</span>
+            </div>
+            <div class="persona-role">School Chaplain & Celebrant • Lectionary Scripture, Notes, Blessing</div>
+          </div>
+          <span style="font-size: 0.85rem; color: var(--color-primary); font-weight: 600;">Enter →</span>
+        </div>
+
+        <!-- Music Coordinator Persona -->
+        <div class="persona-card" onclick="auth.loginWithUserId('usr-001')">
+          <img src="assets/avatar.jpg" alt="Faith Mensah" class="persona-avatar">
+          <div class="persona-info">
+            <div class="persona-name">
+              <span>Mr. Faith Mensah</span>
+              <span class="badge-pill badge-blue" style="font-size: 0.65rem;">🎼 Coordinator</span>
+            </div>
+            <div class="persona-role">Music Coordinator • 5-Stage Approval Pipeline, Hymn Swap, Scheduling</div>
+          </div>
+          <span style="font-size: 0.85rem; color: var(--color-primary); font-weight: 600;">Enter →</span>
+        </div>
+
+        <!-- Music Group Member Persona -->
+        <div class="persona-card" onclick="auth.loginWithUserId('usr-004')">
+          <img src="assets/avatar.jpg" alt="Emmanuel Mensah" class="persona-avatar">
+          <div class="persona-info">
+            <div class="persona-name">
+              <span>Emmanuel Mensah</span>
+              <span class="badge-pill badge-gold" style="font-size: 0.65rem;">🎵 Chorister</span>
+            </div>
+            <div class="persona-role">St. Cecilia Choir (Bass) • 13-Part Readiness, Audio Pitch Pipe, Chords</div>
+          </div>
+          <span style="font-size: 0.85rem; color: var(--color-primary); font-weight: 600;">Enter →</span>
+        </div>
+
+        <!-- Administrator Persona -->
+        <div class="persona-card" onclick="auth.loginWithUserId('usr-003')">
+          <img src="assets/avatar.jpg" alt="Sr. Beatrice" class="persona-avatar">
+          <div class="persona-info">
+            <div class="persona-name">
+              <span>Sr. Beatrice Osei</span>
+              <span class="badge-pill badge-orange" style="font-size: 0.65rem;">🛡️ Admin</span>
+            </div>
+            <div class="persona-role">Liturgical Administrator • User Approvals, Role Governance, Access Gate</div>
+          </div>
+          <span style="font-size: 0.85rem; color: var(--color-primary); font-weight: 600;">Enter →</span>
+        </div>
+
+        <!-- Pending User Persona -->
+        <div class="persona-card" onclick="auth.loginWithUserId('usr-005')">
+          <img src="assets/avatar.jpg" alt="Pending User" class="persona-avatar">
+          <div class="persona-info">
+            <div class="persona-name">
+              <span>Theresa Adjei</span>
+              <span class="badge-pill badge-orange" style="font-size: 0.65rem;">⏳ Pending</span>
+            </div>
+            <div class="persona-role">Newly Registered Chorister • Locked 3-Step Approval Timeline Gate</div>
+          </div>
+          <span style="font-size: 0.85rem; color: var(--color-primary); font-weight: 600;">Enter →</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    function showAuthTab(tab) {
+      document.getElementById('auth-pane-login').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('auth-pane-register').style.display = tab === 'register' ? 'block' : 'none';
+      document.getElementById('auth-pane-demo').style.display = tab === 'demo' ? 'block' : 'none';
+
+      document.getElementById('tab-btn-login').className = `auth-tab-btn ${tab === 'login' ? 'active' : ''}`;
+      document.getElementById('tab-btn-register').className = `auth-tab-btn ${tab === 'register' ? 'active' : ''}`;
+      document.getElementById('tab-btn-demo').className = `auth-tab-btn ${tab === 'demo' ? 'active' : ''}`;
+    }
+
+    function handleFormLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const res = auth.login(email, 'demo');
+      if (!res.success) {
+        alert(res.message);
+      }
+    }
+
+    function handleFormRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const role = document.getElementById('reg-role').value;
+      const groupName = document.getElementById('reg-group').value;
+      const voicePart = document.getElementById('reg-voice').value;
+
+      if (!name || !email) {
+        alert('Please complete all required fields.');
+        return;
+      }
+
+      const roleLabels = {
+        chaplain: 'School Chaplain & Celebrant',
+        coordinator: 'Music Coordinator',
+        group: 'Music Group Member',
+        admin: 'Liturgical Administrator'
+      };
+
+      auth.register({
+        name,
+        email,
+        role,
+        roleLabel: roleLabels[role] || role,
+        groupName,
+        voicePart,
+        notes: 'Newly self-registered via public portal.'
+      });
+    }
+
+    // Auto switch to demo tab if requested via query ?tab=demo
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'demo') {
+      showAuthTab('demo');
+    }
+  </script>
+</body>
+</html>

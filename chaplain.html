@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Chaplain & Celebrant Portal &bull; OLAG SMMMS</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Specific Chaplain Liturgical theme accents */
+    .top-header {
+      border-bottom: 2px solid rgba(147, 51, 234, 0.2);
+    }
+  </style>
+</head>
+<body class="liturgical-theme-easter">
+  <div class="app-container">
+    <!-- Standalone Sidebar for Chaplain -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.jpg" alt="OLAG SHS Crest" class="school-crest-img">
+        <div class="brand-text">
+          <h1>SMMMS</h1>
+          <span>Chaplaincy Portal</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item active" href="chaplain.html">
+          <span class="nav-item-icon">✝️</span>
+          <span>Celebrant View</span>
+        </a>
+        <a class="nav-item" href="index.html#schedule">
+          <span class="nav-item-icon">📅</span>
+          <span>Mass Calendar</span>
+        </a>
+        <a class="nav-item" href="index.html#arrangement">
+          <span class="nav-item-icon">🎼</span>
+          <span>Hymn Selections</span>
+        </a>
+        <a class="nav-item" href="index.html#library">
+          <span class="nav-item-icon">📖</span>
+          <span>Catholic Hymnal</span>
+        </a>
+        <a class="nav-item" href="index.html#approvals">
+          <span class="nav-item-icon">✅</span>
+          <span>Pastoral Blessings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p class="sidebar-quote">"Priest of God, celebrate this Holy Mass as if it were your first, your last, your only Mass."</p>
+        <p class="sidebar-quote-verse">St. John Vianney</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="document.getElementById('app-sidebar').classList.toggle('open')" aria-label="Toggle Menu">
+            ☰
+          </button>
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <span style="font-size: 1.25rem;">✝️</span>
+            <div>
+              <h2 class="header-title" style="margin: 0; line-height: 1.2;">Chaplaincy & Celebrant Dashboard</h2>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Liturgical Readings, Pastoral Endorsement & Choir Alignment</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Switch View Link -->
+          <a href="login.html?tab=demo" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" title="Switch to another persona or sign in as different user">
+            <span>🔄</span> Switch Persona
+          </a>
+
+          <!-- Return to Unified Hub -->
+          <a href="index.html" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" title="Full unified system view">
+            <span>🏛️</span> Unified Hub
+          </a>
+
+          <!-- Chaplain User Profile Pill -->
+          <div class="user-profile-menu">
+            <img src="assets/avatar.jpg" alt="Fr. Aidoo" class="user-avatar-img" id="header-user-avatar">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.35rem;">
+                <span class="user-meta-name" id="header-user-name">Fr. Emmanuel K. Aidoo</span>
+                <span class="badge-pill badge-green" id="header-user-status-badge">Approved</span>
+              </div>
+              <span class="role-select-inline" id="header-user-role" style="border: none; background: transparent; padding: 0; font-size: 0.75rem; color: var(--color-text-muted);">
+                School Chaplain & Celebrant
+              </span>
+            </div>
+          </div>
+
+          <!-- Sign Out Button -->
+          <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.35rem 0.6rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="auth.logout()" title="Sign out of SMMMS">
+            🚪 Exit
+          </button>
+        </div>
+      </header>
+
+      <!-- Chaplain Dedicated Content Container -->
+      <div id="chaplain-dashboard-container" style="padding: 1.5rem;">
+        <!-- Populated dynamically by ChaplainDashboardController in js/dashboards/chaplain-dashboard.js -->
+        <div style="text-align: center; padding: 4rem 1rem;">
+          <div style="font-size: 2.5rem; animation: pulse 1.5s infinite;">✝️</div>
+          <p style="margin-top: 1rem; color: var(--color-text-muted);">Loading Pastoral Lectionary & Liturgy...</p>
+        </div>
+      </div>
+
+      <!-- Chaplain Modals Holder -->
+      <div id="chaplain-modal-container"></div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboards/chaplain-dashboard.js"></script>
+</body>
+</html>

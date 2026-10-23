@@ -1,9 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "buildCommand": null,
-  "outputDirectory": ".",
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/chaplain", "destination": "/chaplain.html" },
+    { "source": "/coordinator", "destination": "/coordinator.html" },
+    { "source": "/group", "destination": "/group.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/pending", "destination": "/pending.html" }
   ]
 }

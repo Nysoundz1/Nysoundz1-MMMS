@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Music Coordinator Portal &bull; OLAG SMMMS</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .top-header {
+      border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+    }
+  </style>
+</head>
+<body class="liturgical-theme-easter">
+  <div class="app-container">
+    <!-- Standalone Sidebar for Coordinator -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.jpg" alt="OLAG SHS Crest" class="school-crest-img">
+        <div class="brand-text">
+          <h1>SMMMS</h1>
+          <span>Music Coordinator</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item active" href="coordinator.html">
+          <span class="nav-item-icon">🎼</span>
+          <span>Pipeline & Pipeline</span>
+        </a>
+        <a class="nav-item" href="index.html#schedule">
+          <span class="nav-item-icon">📅</span>
+          <span>Mass Schedules</span>
+        </a>
+        <a class="nav-item" href="index.html#arrangement">
+          <span class="nav-item-icon">🎵</span>
+          <span>13 Liturgical Parts</span>
+        </a>
+        <a class="nav-item" href="index.html#groups">
+          <span class="nav-item-icon">👥</span>
+          <span>Choir Groups</span>
+        </a>
+        <a class="nav-item" href="index.html#library">
+          <span class="nav-item-icon">📚</span>
+          <span>Hymn Repository</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p class="sidebar-quote">"To sing is to pray twice."</p>
+        <p class="sidebar-quote-verse">St. Augustine</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="document.getElementById('app-sidebar').classList.toggle('open')" aria-label="Toggle Menu">
+            ☰
+          </button>
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <span style="font-size: 1.25rem;">🎼</span>
+            <div>
+              <h2 class="header-title" style="margin: 0; line-height: 1.2;">Music Coordinator Command Center</h2>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">5-Stage Approval Pipeline, Choir Assignments & Song Corrections</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Switch View Link -->
+          <a href="login.html?tab=demo" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" title="Switch to another persona">
+            <span>🔄</span> Switch Persona
+          </a>
+
+          <!-- Return to Unified Hub -->
+          <a href="index.html" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" title="Full unified system view">
+            <span>🏛️</span> Unified Hub
+          </a>
+
+          <!-- Coordinator User Profile Pill -->
+          <div class="user-profile-menu">
+            <img src="assets/avatar.jpg" alt="Faith Mensah" class="user-avatar-img" id="header-user-avatar">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.35rem;">
+                <span class="user-meta-name" id="header-user-name">Mr. Faith Mensah</span>
+                <span class="badge-pill badge-green" id="header-user-status-badge">Approved</span>
+              </div>
+              <span class="role-select-inline" id="header-user-role" style="border: none; background: transparent; padding: 0; font-size: 0.75rem; color: var(--color-text-muted);">
+                Music Coordinator • Staff
+              </span>
+            </div>
+          </div>
+
+          <!-- Sign Out Button -->
+          <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.35rem 0.6rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="auth.logout()" title="Sign out of SMMMS">
+            🚪 Exit
+          </button>
+        </div>
+      </header>
+
+      <!-- Coordinator Dedicated Content Container -->
+      <div id="coordinator-dashboard-container" style="padding: 1.5rem;">
+        <!-- Populated dynamically by CoordinatorDashboardController in js/dashboards/coordinator-dashboard.js -->
+        <div style="text-align: center; padding: 4rem 1rem;">
+          <div style="font-size: 2.5rem; animation: pulse 1.5s infinite;">🎼</div>
+          <p style="margin-top: 1rem; color: var(--color-text-muted);">Loading Coordinator Pipeline & Liturgical Schedules...</p>
+        </div>
+      </div>
+
+      <!-- Coordinator Modals Holder -->
+      <div id="coordinator-modal-container"></div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboards/coordinator-dashboard.js"></script>
+</body>
+</html>

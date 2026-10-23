@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Administrator Approvals &bull; OLAG SMMMS</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .top-header {
+      border-bottom: 2px solid rgba(245, 158, 11, 0.25);
+    }
+  </style>
+</head>
+<body class="liturgical-theme-easter">
+  <div class="app-container">
+    <!-- Standalone Sidebar for Administrator -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.jpg" alt="OLAG SHS Crest" class="school-crest-img">
+        <div class="brand-text">
+          <h1>SMMMS</h1>
+          <span>Admin Portal</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item active" href="admin.html">
+          <span class="nav-item-icon">🛡️</span>
+          <span>User Approvals</span>
+        </a>
+        <a class="nav-item" href="index.html#users">
+          <span class="nav-item-icon">👥</span>
+          <span>User Directory</span>
+        </a>
+        <a class="nav-item" href="index.html#approvals">
+          <span class="nav-item-icon">✅</span>
+          <span>Liturgy Approvals</span>
+        </a>
+        <a class="nav-item" href="index.html#schedule">
+          <span class="nav-item-icon">📅</span>
+          <span>School Calendar</span>
+        </a>
+        <a class="nav-item" href="index.html#archive">
+          <span class="nav-item-icon">📁</span>
+          <span>Historical Archive</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p class="sidebar-quote">"Let all things be done decently and in order."</p>
+        <p class="sidebar-quote-verse">1 Corinthians 14:40</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="document.getElementById('app-sidebar').classList.toggle('open')" aria-label="Toggle Menu">
+            ☰
+          </button>
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <span style="font-size: 1.25rem;">🛡️</span>
+            <div>
+              <h2 class="header-title" style="margin: 0; line-height: 1.2;">Liturgical Administration & Approvals</h2>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">Access Governance, Individual Account Authorization & Role Roster</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Switch View Link -->
+          <a href="login.html?tab=demo" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" title="Switch persona">
+            <span>🔄</span> Switch Persona
+          </a>
+
+          <!-- Return to Unified Hub -->
+          <a href="index.html" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" title="Full unified system view">
+            <span>🏛️</span> Unified Hub
+          </a>
+
+          <!-- Admin Profile Pill -->
+          <div class="user-profile-menu">
+            <img src="assets/avatar.jpg" alt="Sr. Beatrice Osei" class="user-avatar-img" id="header-user-avatar">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.35rem;">
+                <span class="user-meta-name" id="header-user-name">Sr. Beatrice Osei</span>
+                <span class="badge-pill badge-green" id="header-user-status-badge">Approved Admin</span>
+              </div>
+              <span class="role-select-inline" id="header-user-role" style="border: none; background: transparent; padding: 0; font-size: 0.75rem; color: var(--color-text-muted);">
+                System & Liturgical Administrator
+              </span>
+            </div>
+          </div>
+
+          <!-- Sign Out Button -->
+          <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.35rem 0.6rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="auth.logout()" title="Sign out of SMMMS">
+            🚪 Exit
+          </button>
+        </div>
+      </header>
+
+      <!-- Admin Dedicated Content Container -->
+      <div id="admin-dashboard-container" style="padding: 1.5rem;">
+        <!-- Populated dynamically by AdminDashboardController in js/dashboards/admin-dashboard.js -->
+        <div style="text-align: center; padding: 4rem 1rem;">
+          <div style="font-size: 2.5rem; animation: pulse 1.5s infinite;">🛡️</div>
+          <p style="margin-top: 1rem; color: var(--color-text-muted);">Loading User Approvals & Authorization Queue...</p>
+        </div>
+      </div>
+
+      <!-- Admin Modals Holder -->
+      <div id="admin-modal-container"></div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboards/admin-dashboard.js"></script>
+</body>
+</html>
