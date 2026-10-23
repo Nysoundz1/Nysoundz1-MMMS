@@ -209,6 +209,13 @@ html, body {
   font-weight: 700;
   padding: 0.1rem 0.45rem;
   border-radius: var(--radius-full);
+.sidebar-section-title {
+  padding: 0.75rem 1rem 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.75px;
+  text-transform: uppercase;
 }
 
 /* Sidebar Bottom Scripture Quote */
@@ -354,6 +361,15 @@ html, body {
   color: var(--text-muted);
   outline: none;
   cursor: pointer;
+}
+
+.portal-dropdown-link {
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.portal-dropdown-link:hover {
+  background: var(--bg-surface-subtle) !important;
+  color: var(--color-primary) !important;
 }
 
 /* Button UI */

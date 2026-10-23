@@ -43,18 +43,6 @@ class SMMMSApp {
       });
     }
 
-    // Toggle Phone Mockup floating frame
-    const phoneToggleBtn = document.getElementById('toggle-phone-mockup-btn');
-    const phoneMockup = document.getElementById('phone-mockup-floating');
-    if (phoneToggleBtn && phoneMockup) {
-      phoneToggleBtn.addEventListener('click', () => {
-        phoneMockup.classList.toggle('active');
-        const isActive = phoneMockup.classList.contains('active');
-        phoneToggleBtn.classList.toggle('btn-primary', isActive);
-        phoneToggleBtn.classList.toggle('btn-outline', !isActive);
-        this.showToast(isActive ? 'Opened phone preview mockup' : 'Closed phone preview', 'info');
-      });
-    }
 
     // Role / User switcher dropdown
     const roleSelect = document.getElementById('user-role-select');
@@ -72,6 +60,16 @@ class SMMMSApp {
     // Subscribe to store updates
     store.subscribe(() => {
       this.render();
+    });
+
+    // Close portals dropdown menu on outside click
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('portals-dropdown');
+      if (menu && menu.style.display === 'block') {
+        if (!e.target.closest('.portals-menu-wrap')) {
+          menu.style.display = 'none';
+        }
+      }
     });
   }
 
@@ -140,7 +138,6 @@ class SMMMSApp {
     this.renderApprovals();
     this.renderArchive();
     this.renderUsers();
-    this.renderPhoneMockupContent();
   }
 
   // ==========================================
@@ -175,9 +172,9 @@ class SMMMSApp {
       }
     }
 
-    // Admin Sidebar Link & Badge
+    // Admin Sidebar Link & Badge: Only visible if active user is Admin
     if (navUsers) {
-      navUsers.style.display = (currentUser.role === 'admin') ? 'flex' : 'flex'; // Visible for easy access
+      navUsers.style.display = (currentUser.role === 'admin') ? 'flex' : 'none';
     }
     if (navUsersBadge) {
       navUsersBadge.textContent = pendingUsers.length;
@@ -1663,68 +1660,14 @@ ${transposedChords}
   }
 
   // ==========================================
-  // PHONE PREVIEW (IPHONE MOCKUP)
+  // DEDICATED PORTALS MENU CONTROLLER
   // ==========================================
-  renderPhoneMockupContent() {
-    const container = document.getElementById('iphone-mockup-content');
-    if (!container) return;
-
-    const arr = store.getArrangementById(this.activeArrangementId) || DEFAULT_ARRANGEMENTS[0];
-    const mass = store.getMassById(arr.massId);
-    const songs = arr.songs || {};
-
-    container.innerHTML = `
-      <!-- Header -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <img src="assets/logo.jpg" alt="Crest" style="width: 28px; height: 28px; border-radius: 4px;">
-          <div>
-            <div style="font-size: 0.82rem; font-weight: 800; color: #0f172a; line-height: 1;">OLAG SHS</div>
-            <div style="font-size: 0.65rem; color: #64748b;">Mass Music</div>
-          </div>
-        </div>
-        <img src="assets/avatar.jpg" alt="Faith" style="width: 28px; height: 28px; border-radius: 50%;">
-      </div>
-
-      <!-- Greeting -->
-      <div style="margin-bottom: 1rem;">
-        <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a;">Good morning, Emmanuel! 👋</h3>
-        <p style="font-size: 0.75rem; color: #64748b;">Here's today's Mass arrangement.</p>
-      </div>
-
-      <!-- Chalice Card -->
-      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.85rem; display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-        <img src="assets/chalice.jpg" alt="Chalice" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
-        <div>
-          <h4 style="font-size: 0.9rem; font-weight: 800; color: #0f172a;">${mass ? mass.theme : arr.massTitle}</h4>
-          <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">${mass ? (mass.displayDate || mass.date) : arr.massDisplayDate} &bull; 7:00 AM</div>
-          <div style="font-size: 0.68rem; color: #64748b;">${mass ? mass.venue : 'School Chapel'}</div>
-          <span class="badge-pill badge-green" style="font-size: 0.62rem; padding: 0.1rem 0.45rem; margin-top: 4px;">
-            ${arr.status === 'approved' ? 'Approved' : 'Official'}
-          </span>
-        </div>
-      </div>
-
-      <!-- Mass Parts List on Phone -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-        <h4 style="font-size: 0.85rem; font-weight: 800; color: #0f172a;">Mass Parts (13)</h4>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 0.45rem;">
-        ${MASS_PARTS.map(part => {
-          const s = songs[part.id] || { title: 'Not assigned', key: 'G' };
-          return `
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.75rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="app.openChordModal('${s.songId || ''}', '${part.id}')">
-              <div>
-                <div style="font-size: 0.68rem; font-weight: 700; color: #2563eb;">${part.order}. ${part.name}</div>
-                <div style="font-size: 0.78rem; font-weight: 700; color: #0f172a;">${s.title}</div>
-              </div>
-              <span style="color: #94a3b8; font-size: 0.8rem;">&rsaquo;</span>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
+  togglePortalsMenu(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById('portals-dropdown');
+    if (!menu) return;
+    const isShowing = menu.style.display === 'block';
+    menu.style.display = isShowing ? 'none' : 'block';
   }
 
   // --- Mass Details Modal ---

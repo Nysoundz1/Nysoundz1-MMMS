@@ -1,13 +1,19 @@
 // Dedicated Dashboard Controller for Music Group Member / Chorister
 // File: js/dashboards/group-dashboard.js
 // Persona: Emmanuel Mensah (St. Cecilia Choir - Bass)
-// Aesthetic: Clean, Simple, Focused Rehearsal Desk
+// Aesthetic: Clean, Simple, Focused Rehearsal Desk with Progressive Disclosure
 
 class GroupDashboardController {
   constructor() {
     this.audioCtx = null;
     this.practicedMap = {};
+    this.activeTab = 'sheet';
     this.init();
+  }
+
+  setTab(tab) {
+    this.activeTab = tab;
+    this.render();
   }
 
   init() {
@@ -67,7 +73,7 @@ class GroupDashboardController {
 
         <div class="compact-header-actions">
           <button class="btn btn-sm btn-outline" onclick="groupApp.copyWhatsAppProgramme()" style="padding: 0.45rem 0.85rem;">
-            📱 WhatsApp Format
+            📱 Copy WhatsApp
           </button>
           <button class="btn btn-sm btn-outline" onclick="window.print()" style="padding: 0.45rem 0.85rem;">
             🖨️ Print Sheet
@@ -75,26 +81,106 @@ class GroupDashboardController {
         </div>
       </div>
 
-      <!-- 2. Compact Audio Pitch Pipe Bar -->
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="font-size: 1.1rem;">🔔</span>
-          <span style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-main);">Pitch Pipe:</span>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">(Concert pitch references)</span>
-        </div>
-        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(261.63, 'C')" style="padding: 0.25rem 0.65rem; font-weight: 700;">C</button>
-          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(293.66, 'D')" style="padding: 0.25rem 0.65rem; font-weight: 700;">D</button>
-          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(329.63, 'E')" style="padding: 0.25rem 0.65rem; font-weight: 700;">E</button>
-          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(349.23, 'F')" style="padding: 0.25rem 0.65rem; font-weight: 700;">F</button>
-          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(392.00, 'G')" style="padding: 0.25rem 0.65rem; font-weight: 700;">G</button>
-          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(440.00, 'A')" style="padding: 0.25rem 0.65rem; font-weight: 700;">A</button>
-          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(466.16, 'Bb')" style="padding: 0.25rem 0.65rem; font-weight: 700;">B♭</button>
-        </div>
+      <!-- 2. Clean Segmented Focus Tabs -->
+      <div class="clean-segmented-tabs">
+        <button class="clean-tab-pill ${this.activeTab === 'sheet' ? 'active' : ''}" onclick="groupApp.setTab('sheet')">
+          🎼 13-Part Music Checklist (${practicedCount}/${totalParts})
+        </button>
+        <button class="clean-tab-pill ${this.activeTab === 'audio' ? 'active' : ''}" onclick="groupApp.setTab('audio')">
+          🔔 Concert Pitch Pipe & Tuning
+        </button>
+        <button class="clean-tab-pill ${this.activeTab === 'whatsapp' ? 'active' : ''}" onclick="groupApp.setTab('whatsapp')">
+          📱 WhatsApp Notice
+        </button>
       </div>
 
-      <!-- 3. 4 Classical Liturgical Phases with Rehearsal Readiness Checks -->
-      ${this.renderPhasesRehearsalGrid(songs)}
+      <!-- 3. Focused Tab Content -->
+      ${this.activeTab === 'sheet' ? this.renderPhasesRehearsalGrid(songs) : ''}
+      ${this.activeTab === 'audio' ? this.renderAudioTuningTab() : ''}
+      ${this.activeTab === 'whatsapp' ? this.renderWhatsAppTab(upcoming, songs) : ''}
+    `;
+  }
+
+  renderAudioTuningTab() {
+    return `
+      <div class="card" style="padding: 1.5rem; text-align: center;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🔔</div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">Concert Pitch Pipe & Choir Loft Audio Reference</h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 1.5rem;">
+          Pure acoustic sine-tone reference frequencies (A4 = 440 Hz) for a cappella intonation, section key sounding, and part singing rehearsals.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+          <button class="btn btn-outline" onclick="groupApp.playPitch(261.63, 'C')" style="padding: 0.65rem 1.15rem; font-weight: 800; font-size: 1rem;">
+            C <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">261.6 Hz</span>
+          </button>
+          <button class="btn btn-outline" onclick="groupApp.playPitch(293.66, 'D')" style="padding: 0.65rem 1.15rem; font-weight: 800; font-size: 1rem;">
+            D <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">293.7 Hz</span>
+          </button>
+          <button class="btn btn-outline" onclick="groupApp.playPitch(329.63, 'E')" style="padding: 0.65rem 1.15rem; font-weight: 800; font-size: 1rem;">
+            E <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">329.6 Hz</span>
+          </button>
+          <button class="btn btn-outline" onclick="groupApp.playPitch(349.23, 'F')" style="padding: 0.65rem 1.15rem; font-weight: 800; font-size: 1rem;">
+            F <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">349.2 Hz</span>
+          </button>
+          <button class="btn btn-outline" onclick="groupApp.playPitch(392.00, 'G')" style="padding: 0.65rem 1.15rem; font-weight: 800; font-size: 1rem;">
+            G <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">392.0 Hz</span>
+          </button>
+          <button class="btn btn-outline" onclick="groupApp.playPitch(440.00, 'A')" style="padding: 0.65rem 1.15rem; font-weight: 800; font-size: 1rem; border-color: #ea580c; color: #ea580c;">
+            A <span style="font-size: 0.7rem; color: #ea580c; display: block;">440.0 Hz</span>
+          </button>
+          <button class="btn btn-outline" onclick="groupApp.playPitch(466.16, 'Bb')" style="padding: 0.65rem 1.15rem; font-weight: 800; font-size: 1rem;">
+            B♭ <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">466.2 Hz</span>
+          </button>
+        </div>
+
+        <div style="font-size: 0.78rem; color: var(--text-muted); background: var(--bg-surface-subtle); padding: 0.65rem 1rem; border-radius: var(--radius-sm); max-width: 480px; margin: 0 auto;">
+          💡 <em>Tip: Tap a tone to sound the pitch for your voice section during choir warm-up.</em>
+        </div>
+      </div>
+    `;
+  }
+
+  renderWhatsAppTab(upcoming, songs) {
+    const list = [
+      `1. Entrance: ${songs.entrance?.title || 'Holy, Holy, Holy'} (${songs.entrance?.key || 'Key D'})`,
+      `2. Kyrie: ${songs.kyrie?.title || 'Kyrie Eleison'}`,
+      `3. Gloria: ${songs.gloria?.title || 'Glory to God'}`,
+      `4. Psalm: ${songs.psalm?.title || 'Psalm 8'} (${songs.psalm?.key || 'Key F'})`,
+      `5. Alleluia: ${songs.alleluia?.title || 'Celtic Alleluia'}`,
+      `6. Offertory: ${songs.offertory?.title || 'Take and Sanctify'} (${songs.offertory?.key || 'Key G'})`,
+      `7. Sanctus: ${songs.sanctus?.title || 'Holy, Holy'}`,
+      `8. Mystery: ${songs.mystery?.title || 'Memorial Acclamation'}`,
+      `9. Amen: ${songs.amen?.title || 'Great Amen'}`,
+      `10. Agnus Dei: ${songs.agnus?.title || 'Lamb of God'}`,
+      `11. Communion: ${songs.communion?.title || 'Panis Angelicus'} (${songs.communion?.key || 'Key F'})`,
+      `12. Thanksgiving: ${songs.thanksgiving?.title || 'Sing of the Lord\'s Goodness'} (${songs.thanksgiving?.key || 'Key G'})`,
+      `13. Recessional: ${songs.recessional?.title || 'Holy God We Praise Thy Name'} (${songs.recessional?.key || 'Key F'})`
+    ].join('\n');
+
+    return `
+      <div class="card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">📱 WhatsApp Rehearsal Notice</h3>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Formatted text ready to paste directly into your choir WhatsApp group</span>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="groupApp.copyWhatsAppProgramme()">
+            📋 Copy to Clipboard
+          </button>
+        </div>
+
+        <pre style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.6; color: var(--text-main); white-space: pre-wrap; margin: 0;">
+⛪ *OUR LADY OF GRACE SENIOR HIGH SCHOOL*
+🎶 *MASS MUSIC PROGRAMME*
+📅 *Mass:* ${upcoming.theme} (${upcoming.displayDate})
+👥 *Assigned Choir:* ${upcoming.assignedGroupName || 'Marian Voices'}
+
+══════════════════════════
+${list}
+══════════════════════════
+_Please come along with your hymnal and be in the choir loft 30 minutes before Mass._</pre>
+      </div>
     `;
   }
 
@@ -153,10 +239,10 @@ class GroupDashboardController {
                 return `
                   <div class="phase-song-row" style="${isPracticed ? 'background: rgba(16, 185, 129, 0.04);' : ''}">
                     <div class="phase-song-meta">
-                      <input type="checkbox"
+                      <input type="checkbox" 
                         id="chk-${item.key}"
-                        ${isPracticed ? 'checked' : ''}
-                        onchange="groupApp.togglePracticed('${item.key}')"
+                        ${isPracticed ? 'checked' : ''} 
+                        onchange="groupApp.togglePracticed('${item.key}')" 
                         style="cursor: pointer; width: 16px; height: 16px; accent-color: #10b981;"
                         title="Mark as practiced"
                       />
