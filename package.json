@@ -4,6 +4,7 @@
   "description": "Mass Music Management System (MMMS) for Catholic high schools and parishes",
   "main": "server.js",
   "scripts": {
+    "build": "echo 'Static build ready'",
     "start": "node server.js",
     "dev": "node server.js"
   },
