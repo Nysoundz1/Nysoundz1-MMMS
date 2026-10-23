@@ -2,7 +2,7 @@
 
 class MMMSStore {
   constructor() {
-    this.storageKey = 'olag_smmms_state_v2';
+    this.storageKey = 'olag_smmms_state_v3';
     this.listeners = [];
     this.state = this.loadState();
   }
@@ -21,7 +21,9 @@ class MMMSStore {
 
   getInitialState() {
     return {
+      currentUserId: 'usr-faith-mensah',
       currentRole: 'group', // Faith Mensah default
+      users: DEFAULT_USERS,
       theme: 'light',
       seasons: DEFAULT_LITURGICAL_SEASONS,
       parts: MASS_PARTS,
@@ -57,9 +59,96 @@ class MMMSStore {
     this.listeners.forEach(fn => fn(this.state));
   }
 
+  // --- User Accounts & Admin Approvals ---
+  getUsers() {
+    return this.state.users || DEFAULT_USERS;
+  }
+
+  getUserById(id) {
+    return this.getUsers().find(u => u.id === id);
+  }
+
+  getCurrentUser() {
+    const user = this.getUserById(this.state.currentUserId);
+    if (user) return user;
+    return this.getUsers()[0];
+  }
+
+  setCurrentUser(userId) {
+    const user = this.getUserById(userId);
+    if (user) {
+      this.state.currentUserId = user.id;
+      this.state.currentRole = user.role;
+      this.saveState();
+    }
+  }
+
+  approveUser(userId, adminName = 'System Administrator') {
+    const user = this.getUserById(userId);
+    if (user) {
+      user.status = 'approved';
+      user.approvedBy = adminName;
+      user.approvedDate = new Date().toISOString().split('T')[0];
+      this.saveState();
+      return user;
+    }
+    return null;
+  }
+
+  rejectUser(userId, reason = 'Registration details could not be verified by Admin.') {
+    const user = this.getUserById(userId);
+    if (user) {
+      user.status = 'rejected';
+      user.rejectionReason = reason;
+      this.saveState();
+      return user;
+    }
+    return null;
+  }
+
+  setPendingUser(userId) {
+    const user = this.getUserById(userId);
+    if (user) {
+      user.status = 'pending';
+      user.approvedBy = null;
+      user.approvedDate = null;
+      this.saveState();
+      return user;
+    }
+    return null;
+  }
+
+  registerUser(userData) {
+    const newUser = {
+      id: `usr-${Date.now()}`,
+      name: userData.name,
+      email: userData.email,
+      role: userData.role,
+      roleLabel: userData.roleLabel || userData.role,
+      groupName: userData.groupName || 'Unassigned',
+      groupId: userData.groupId || null,
+      voicePart: userData.voicePart || 'Member',
+      status: 'pending', // ALL NEW REGISTRATIONS ARE PENDING ADMIN APPROVAL
+      avatar: 'assets/avatar.jpg',
+      registeredDate: new Date().toISOString().split('T')[0],
+      approvedBy: null,
+      approvedDate: null,
+      notes: userData.notes || 'Newly registered user awaiting Admin approval.'
+    };
+    if (!this.state.users) this.state.users = [...DEFAULT_USERS];
+    this.state.users.push(newUser);
+    this.saveState();
+    return newUser;
+  }
+
   // --- Current Role & Theme ---
   setRole(roleId) {
     this.state.currentRole = roleId;
+    // Also try to find a matching user for this role
+    const matchingUser = this.getUsers().find(u => u.role === roleId);
+    if (matchingUser) {
+      this.state.currentUserId = matchingUser.id;
+    }
     this.saveState();
   }
 
@@ -214,6 +303,35 @@ class MMMSStore {
       this.saveState();
     }
     return arr;
+  }
+
+  // Pastoral Oversight: Chaplain Endorses Mass Arrangement
+  endorseMassArrangement(massId, blessingText = 'Pastoral Blessing and Liturgical Endorsement granted.', chaplainName = 'Fr. Emmanuel K. Aidoo (Chaplain)') {
+    const mass = this.getMassById(massId);
+    if (mass) {
+      mass.chaplainEndorsed = true;
+      mass.chaplainEndorsedBy = chaplainName;
+      mass.chaplainBlessing = blessingText;
+      mass.chaplainEndorsedAt = new Date().toISOString();
+      const arr = this.getArrangementByMassId(massId);
+      if (arr) {
+        arr.chaplainEndorsed = true;
+        arr.chaplainEndorsedBy = chaplainName;
+      }
+      this.saveState();
+      return mass;
+    }
+    return null;
+  }
+
+  updateMassChaplainNotes(massId, notes) {
+    const mass = this.getMassById(massId);
+    if (mass) {
+      mass.chaplainNotes = notes;
+      this.saveState();
+      return mass;
+    }
+    return null;
   }
 
   // Archive Feature: Reuse Previous Arrangement for an Upcoming Mass

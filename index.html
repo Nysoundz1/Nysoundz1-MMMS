@@ -49,6 +49,11 @@
           <span class="nav-item-icon">📁</span>
           <span>Archive</span>
         </a>
+        <a class="nav-item" data-nav="users" id="nav-users">
+          <span class="nav-item-icon">🛡️</span>
+          <span>User Approvals</span>
+          <span class="nav-badge" id="nav-users-badge" style="background: #ea580c; display: none;">0</span>
+        </a>
         <a class="nav-item" data-nav="settings" id="nav-settings">
           <span class="nav-item-icon">⚙️</span>
           <span>Settings</span>
@@ -73,28 +78,32 @@
         </div>
 
         <div class="header-actions">
+          <!-- Register Account Button -->
+          <button class="btn-primary" style="font-size: 0.76rem; padding: 0.35rem 0.65rem;" onclick="app.openRegisterUserModal()" title="Register a new user account (requires Admin approval)">
+            <span>➕</span> Register Account
+          </button>
+
           <!-- Toggle iPhone Mockup Preview -->
           <button class="btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" id="toggle-phone-mockup-btn" title="Toggle interactive phone mockup preview">
             <span>📱</span> Phone View
           </button>
 
           <!-- Notification Bell -->
-          <button class="btn-icon-nav" aria-label="Notifications" onclick="app.showToast('Notification: 1 Mass arrangement awaiting review.', 'info')">
+          <button class="btn-icon-nav" aria-label="Notifications" onclick="app.showToast('System Notification: All accounts require Admin approval before access.', 'info')">
             🔔
             <span class="notification-dot"></span>
           </button>
 
           <!-- User Profile & Role Switcher -->
           <div class="user-profile-menu">
-            <img src="assets/avatar.jpg" alt="Faith Mensah" class="user-avatar-img">
+            <img src="assets/avatar.jpg" alt="User Profile" class="user-avatar-img" id="user-display-avatar">
             <div>
-              <div class="user-meta-name" id="user-display-name">Faith Mensah</div>
-              <select class="role-select-inline" id="user-role-select" title="Switch User Role">
-                <option value="group">Music Group Member</option>
-                <option value="coordinator">Music Coordinator</option>
-                <option value="chaplain">Priest / Chaplain</option>
-                <option value="student">Student / Member</option>
-                <option value="admin">Administrator</option>
+              <div style="display: flex; align-items: center; gap: 0.35rem;">
+                <span class="user-meta-name" id="user-display-name">Faith Mensah</span>
+                <span class="badge-pill badge-green" id="user-display-status-badge" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Approved</span>
+              </div>
+              <select class="role-select-inline" id="user-role-select" title="Switch User Account">
+                <!-- Dynamically populated in app.js from store.getUsers() -->
               </select>
             </div>
           </div>
@@ -102,102 +111,11 @@
       </header>
 
       <!-- ============================================== -->
-      <!-- MODULE 1: DASHBOARD -->
+      <!-- MODULE 1: DYNAMIC ROLE-BASED DASHBOARD -->
       <!-- ============================================== -->
       <section class="view-section active" id="view-dashboard">
-        <div class="greeting-section">
-          <h1 class="greeting-title">Good evening, Faith! 👋</h1>
-          <p class="greeting-subtitle">Here's what's happening with the Mass music today.</p>
-        </div>
-
-        <!-- 4 Top Stat Cards -->
-        <div class="dash-stats-row">
-          <div class="stat-item-card" onclick="app.navigateTo('schedule')" style="cursor: pointer;">
-            <div class="stat-icon-box stat-icon-blue">📅</div>
-            <div class="stat-content-meta">
-              <span class="stat-label-badge">Upcoming Mass</span>
-              <div class="stat-main-value" id="dash-upcoming-mass-date">Sun, 25 May 2025</div>
-              <span class="stat-subtext">7:00 AM &bull; School Chapel</span>
-            </div>
-          </div>
-
-          <div class="stat-item-card" onclick="app.navigateTo('arrangement')" style="cursor: pointer;">
-            <div class="stat-icon-box stat-icon-green">🎵</div>
-            <div class="stat-content-meta">
-              <span class="stat-label-badge">Today's Arrangement</span>
-              <div class="stat-main-value" id="dash-today-arr-title">Easter Sunday</div>
-              <span class="stat-subtext">School Choir</span>
-            </div>
-          </div>
-
-          <div class="stat-item-card" onclick="app.navigateTo('approvals')" style="cursor: pointer;">
-            <div class="stat-icon-box stat-icon-orange">📄</div>
-            <div class="stat-content-meta">
-              <span class="stat-label-badge">Pending Submissions</span>
-              <div class="stat-main-value" id="dash-pending-count">1</div>
-              <span class="stat-subtext">Awaiting review</span>
-            </div>
-          </div>
-
-          <div class="stat-item-card" onclick="app.navigateTo('library')" style="cursor: pointer;">
-            <div class="stat-icon-box stat-icon-purple">🎼</div>
-            <div class="stat-content-meta">
-              <span class="stat-label-badge">Recently Added Songs</span>
-              <div class="stat-main-value" id="dash-songs-count">3</div>
-              <span class="stat-subtext">This week</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2 Major Panels Row -->
-        <div class="dash-panels-row">
-          <!-- Left: Next Mass Panel -->
-          <div class="dash-panel-card">
-            <div class="panel-header-row">
-              <h3 class="panel-header-title">Next Mass</h3>
-              <a class="panel-link-action" onclick="app.navigateTo('schedule')">View All</a>
-            </div>
-
-            <div class="next-mass-content">
-              <img src="assets/chalice.jpg" alt="Easter Sunday Mass Chalice" class="next-mass-thumb-img">
-              <div class="next-mass-details">
-                <div>
-                  <h4 class="next-mass-name">Easter Sunday</h4>
-                  <div class="next-mass-metadata">
-                    <div>👤 <strong>Celebrant:</strong> Fr. Emmanuel K. Aidoo</div>
-                    <div>👥 <strong>Music Group:</strong> School Choir</div>
-                    <div>🏛️ <strong>Venue:</strong> School Chapel</div>
-                    <div>🌿 <strong>Liturgical Season:</strong> Easter</div>
-                  </div>
-                </div>
-                <div class="next-mass-status-badge">
-                  <span class="badge-pill badge-green" id="dash-next-mass-status">Arrangement Approved</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: Today's Arrangement (Preview) -->
-          <div class="dash-panel-card">
-            <div class="panel-header-row">
-              <h3 class="panel-header-title">Today's Arrangement <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">(Preview)</span></h3>
-              <a class="panel-link-action" onclick="app.navigateTo('arrangement')">View Full Arrangement</a>
-            </div>
-
-            <div class="arrangement-preview-list" id="dash-preview-parts-list">
-              <!-- Dynamically populated -->
-            </div>
-
-            <a class="view-all-parts-link" onclick="app.navigateTo('arrangement')">
-              View All Parts &rarr;
-            </a>
-          </div>
-        </div>
-
-        <!-- Reminder Banner -->
-        <div class="reminder-banner">
-          <span style="font-size: 1.1rem;">ℹ️</span>
-          <span><strong>Reminder:</strong> Please submit your arrangements at least 2 days before the Mass for review.</span>
+        <div id="dashboard-dynamic-content">
+          <!-- Dynamically populated by app.renderDashboard() according to user role and approval status -->
         </div>
       </section>
 
@@ -443,6 +361,76 @@
 
         <div class="data-table-card" style="padding: 1.25rem;" id="archive-list-container">
           <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- MODULE: USER ACCESS & ADMIN APPROVALS -->
+      <!-- ============================================== -->
+      <section class="view-section" id="view-users">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">🛡️ User Access & Administrator Approvals</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Mandatory individual approval portal for Chaplains, Music Coordinators, and Music Group Members.</p>
+          </div>
+          <button class="btn-primary" onclick="app.openRegisterUserModal()">
+            ➕ Register New User
+          </button>
+        </div>
+
+        <!-- 4 Top User Summary Cards -->
+        <div class="dash-stats-row" style="margin-bottom: 1.5rem;">
+          <div class="stat-item-card">
+            <div class="stat-icon-box stat-icon-blue">👥</div>
+            <div class="stat-content-meta">
+              <span class="stat-label-badge">Total Users</span>
+              <div class="stat-main-value" id="admin-total-users-count">6</div>
+              <span class="stat-subtext">Registered accounts</span>
+            </div>
+          </div>
+          <div class="stat-item-card" style="border-left: 3px solid #ea580c;">
+            <div class="stat-icon-box stat-icon-orange">⏳</div>
+            <div class="stat-content-meta">
+              <span class="stat-label-badge" style="color: #ea580c;">Pending Approvals</span>
+              <div class="stat-main-value" id="admin-pending-users-count" style="color: #ea580c;">2</div>
+              <span class="stat-subtext">Action required</span>
+            </div>
+          </div>
+          <div class="stat-item-card">
+            <div class="stat-icon-box stat-icon-green">✅</div>
+            <div class="stat-content-meta">
+              <span class="stat-label-badge">Approved Users</span>
+              <div class="stat-main-value" id="admin-approved-users-count">4</div>
+              <span class="stat-subtext">Full access active</span>
+            </div>
+          </div>
+          <div class="stat-item-card">
+            <div class="stat-icon-box stat-icon-purple">⛪</div>
+            <div class="stat-content-meta">
+              <span class="stat-label-badge">Active Ministries</span>
+              <div class="stat-main-value">5</div>
+              <span class="stat-subtext">Choirs & Guilds</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Accounts Table Card -->
+        <div class="data-table-card" style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="user-filter-tabs">
+              <button class="btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.filterUsersTable('all', this)">All Accounts</button>
+              <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.filterUsersTable('pending', this)">⏳ Pending Approval (<span id="user-filter-pending-count">2</span>)</button>
+              <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.filterUsersTable('approved', this)">✅ Approved</button>
+              <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.filterUsersTable('chaplain', this)">✝️ Chaplains</button>
+              <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.filterUsersTable('coordinator', this)">📋 Coordinators</button>
+              <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.filterUsersTable('group', this)">🎵 Group Members</button>
+            </div>
+            <input type="text" class="search-box-input" id="user-search-input" placeholder="Search users by name, email, choir..." oninput="app.searchUsers(this.value)" style="width: 240px;">
+          </div>
+
+          <div id="users-table-container">
+            <!-- Dynamically populated from store.getUsers() -->
+          </div>
         </div>
       </section>
 
@@ -770,6 +758,123 @@
           <span style="font-size: 1rem;">⋯</span>
           <span>More</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: REGISTER NEW USER (AWAITING APPROVAL) -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="register-user-modal">
+    <div class="modal-box-card" style="max-width: 540px;">
+      <button class="modal-close-icon" onclick="app.closeRegisterUserModal()">&times;</button>
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem;">➕ Register Account</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+        All new accounts for Chaplains, Music Coordinators, and Choir Members require <strong>individual Administrator verification and approval</strong> before access is unlocked.
+      </p>
+
+      <form id="register-user-form" onsubmit="app.handleRegisterUserSubmit(event)">
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Full Name *</label>
+            <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="reg-user-name" required placeholder="e.g. Bernice Addo or Rev. Fr. John K. Mensah">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Email Address *</label>
+              <input type="email" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="reg-user-email" required placeholder="name@olagshs.edu.gh">
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Requested Role *</label>
+              <select class="filter-select" style="width: 100%; margin-top: 0.25rem;" id="reg-user-role" required onchange="app.handleRoleChangeInRegisterModal(this.value)">
+                <option value="group">🎵 Music Group Member</option>
+                <option value="coordinator">📋 Music Coordinator</option>
+                <option value="chaplain">✝️ Priest / Chaplain</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div id="reg-group-col">
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Assigned Music Group / Choir</label>
+              <select class="filter-select" style="width: 100%; margin-top: 0.25rem;" id="reg-user-group">
+                <option value="grp-school-choir">School Choir</option>
+                <option value="grp-youth-choir">Youth Choir</option>
+                <option value="grp-chapel-choir">Chapel Choir</option>
+                <option value="grp-inspirational-band">Inspirational Band Ministry</option>
+                <option value="grp-cantors">Cantors & Soloists Guild</option>
+                <option value="none">General / Unassigned</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Voice Part / Ministry Role</label>
+              <input type="text" class="search-box-input" style="width: 100%; margin-top: 0.25rem;" id="reg-user-voice" placeholder="e.g. Alto Section / Keyboardist / Celebrant">
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Note for Administrator</label>
+            <textarea class="search-box-input" style="width: 100%; margin-top: 0.25rem; font-size: 0.8rem;" rows="2" id="reg-user-notes" placeholder="e.g. New tenor in Form 2 joining School Choir; authorized by Mr. Mensah."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 0.5rem;">
+            <button type="button" class="btn-outline" onclick="app.closeRegisterUserModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Submit Registration for Admin Approval</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CELEBRANT LITURGICAL NOTES (CHAPLAIN) -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="chaplain-notes-modal">
+    <div class="modal-box-card" style="max-width: 520px;">
+      <button class="modal-close-icon" onclick="app.closeChaplainNotesModal()">&times;</button>
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem;">✍️ Celebrant's Liturgical Instructions</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;" id="chaplain-notes-mass-theme">
+        Mass: Easter Sunday
+      </p>
+
+      <form id="chaplain-notes-form" onsubmit="app.handleSaveChaplainNotes(event)">
+        <input type="hidden" id="chaplain-notes-mass-id">
+        <div style="margin-bottom: 1.25rem;">
+          <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Instructions for Music Group & Coordinator *</label>
+          <textarea class="search-box-input" style="width: 100%; margin-top: 0.25rem; font-size: 0.82rem;" rows="4" id="chaplain-notes-text" required placeholder="e.g. Solemn procession with incense. Latin Kyrie and Sanctus. Please keep communion hymn prayerful."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.65rem;">
+          <button type="button" class="btn-outline" onclick="app.closeChaplainNotesModal()">Cancel</button>
+          <button type="submit" class="btn-primary">Save Instructions</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: PASTORAL BLESSING & ENDORSEMENT (CHAPLAIN) -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="chaplain-endorse-modal">
+    <div class="modal-box-card" style="max-width: 520px; text-align: center;">
+      <button class="modal-close-icon" onclick="app.closeChaplainEndorseModal()">&times;</button>
+      <span style="font-size: 2.8rem; display: block; margin-bottom: 0.5rem;">✝️</span>
+      <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">Pastoral Blessing & Liturgical Endorsement</h3>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;" id="chaplain-endorse-mass-title">
+        Easter Sunday High Mass &bull; School Chapel
+      </p>
+      <div style="background: var(--bg-surface-subtle); padding: 0.85rem 1rem; border-radius: var(--radius-md); font-size: 0.8rem; text-align: left; margin-bottom: 1.25rem; border-left: 3px solid #10b981;">
+        <p style="margin: 0; color: var(--text-main); line-height: 1.4;">
+          <em>"By granting this pastoral endorsement, you confirm that the selected 13 liturgical parts, hymns, and antiphons conform to the liturgical norms of the Catholic Church and the spirit of sacred worship."</em>
+        </p>
+      </div>
+      <input type="hidden" id="chaplain-endorse-mass-id">
+      <div style="display: flex; justify-content: center; gap: 0.75rem;">
+        <button class="btn-outline" onclick="app.closeChaplainEndorseModal()">Cancel</button>
+        <button class="btn-primary" onclick="app.confirmChaplainEndorsement()" style="background: #10b981; border-color: #10b981;">
+          ✝️ Grant Pastoral Endorsement
+        </button>
       </div>
     </div>
   </div>

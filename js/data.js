@@ -471,7 +471,12 @@ const DEFAULT_MASSES = [
     status: 'approved',
     arrangementId: 'arr-2025-05-25',
     thumbnail: 'assets/chalice.jpg',
-    readings: 'Acts 10:34a, 37-43 | Psalm 118 | Colossians 3:1-4 | John 20:1-9'
+    readings: 'Acts 10:34a, 37-43 | Psalm 118 | Colossians 3:1-4 | John 20:1-9',
+    vestment: 'White & Gold',
+    vestmentIcon: '⚪',
+    chaplainNotes: 'Solemn Entrance procession with Paschal Candle. Choir to chant Missa de Angelis for Sanctus and Agnus Dei. Extended solemnity recessional.',
+    chaplainEndorsed: true,
+    chaplainEndorsedBy: 'Fr. Emmanuel K. Aidoo (Chaplain)'
   },
   {
     id: 'mass-2025-06-01',
@@ -487,7 +492,12 @@ const DEFAULT_MASSES = [
     status: 'submitted',
     arrangementId: 'arr-2025-06-01',
     thumbnail: 'assets/chalice.jpg',
-    readings: 'Acts 2:1-11 | Psalm 104 | 1 Corinthians 12:3b-7 | John 20:19-23'
+    readings: 'Acts 2:1-11 | Psalm 104 | 1 Corinthians 12:3b-7 | John 20:19-23',
+    vestment: 'Red',
+    vestmentIcon: '🔴',
+    chaplainNotes: 'Golden Sequence "Veni Sancte Spiritus" must be chanted before the Gospel Acclamation. Confirmation candidates to participate in thanksgiving.',
+    chaplainEndorsed: false,
+    chaplainEndorsedBy: null
   },
   {
     id: 'mass-2025-06-08',
@@ -503,7 +513,12 @@ const DEFAULT_MASSES = [
     status: 'draft',
     arrangementId: 'arr-2025-06-08',
     thumbnail: 'assets/chalice.jpg',
-    readings: 'Deuteronomy 4:32-34 | Psalm 33 | Romans 8:14-17 | Matthew 28:16-20'
+    readings: 'Deuteronomy 4:32-34 | Psalm 33 | Romans 8:14-17 | Matthew 28:16-20',
+    vestment: 'White',
+    vestmentIcon: '⚪',
+    chaplainNotes: 'Trinitarian hymns for Offertory and Communion. Reverent four-part harmony for the Gloria.',
+    chaplainEndorsed: false,
+    chaplainEndorsedBy: null
   },
   {
     id: 'mass-2025-06-15',
@@ -519,7 +534,12 @@ const DEFAULT_MASSES = [
     status: 'draft',
     arrangementId: 'arr-2025-06-15',
     thumbnail: 'assets/chalice.jpg',
-    readings: 'Exodus 24:3-8 | Psalm 116 | Hebrews 9:11-15 | Mark 14:12-16'
+    readings: 'Exodus 24:3-8 | Psalm 116 | Hebrews 9:11-15 | Mark 14:12-16',
+    vestment: 'White & Gold',
+    vestmentIcon: '⚪',
+    chaplainNotes: 'Outdoor Eucharistic procession will follow Mass. Prepare Eucharistic hymns (Tantum Ergo, O Salutaris Hostia, Sweet Sacrament Divine).',
+    chaplainEndorsed: false,
+    chaplainEndorsedBy: null
   },
   // Previous Masses in the Archive
   {
@@ -651,10 +671,127 @@ const DEFAULT_ARRANGEMENTS = [
   }
 ];
 
-const USER_ROLES = [
-  { id: 'group', title: 'Faith Mensah', subtitle: 'Music Group Member', icon: '🎵', badge: 'Music Group' },
-  { id: 'coordinator', title: 'Mr. Gabriel Mensah', subtitle: 'Music Coordinator', icon: '📋', badge: 'Coordinator' },
-  { id: 'chaplain', title: 'Fr. Emmanuel K. Aidoo', subtitle: 'School Chaplain', icon: '✝️', badge: 'Chaplain' },
-  { id: 'student', title: 'Emmanuel Tetteh', subtitle: 'Choir Member', icon: '📱', badge: 'Member' },
-  { id: 'admin', title: 'Administrator', subtitle: 'System Admin', icon: '⚙️', badge: 'Admin' }
+const DEFAULT_USERS = [
+  {
+    id: 'usr-faith-mensah',
+    name: 'Faith Mensah',
+    email: 'f.mensah@olagshs.edu.gh',
+    role: 'group',
+    roleLabel: 'Music Group Member',
+    groupName: 'School Choir',
+    groupId: 'grp-school-choir',
+    voicePart: 'Soprano Section Leader',
+    status: 'approved',
+    avatar: 'assets/avatar.jpg',
+    registeredDate: '2025-05-01',
+    approvedBy: 'Administrator',
+    approvedDate: '2025-05-02',
+    notes: 'Active choir member and liturgical soprano.'
+  },
+  {
+    id: 'usr-gabriel-mensah',
+    name: 'Mr. Gabriel K. Mensah',
+    email: 'g.mensah@olagshs.edu.gh',
+    role: 'coordinator',
+    roleLabel: 'Music Coordinator',
+    groupName: 'All Liturgical Music Ministries',
+    groupId: null,
+    voicePart: 'Choir Director & Organist',
+    status: 'approved',
+    avatar: 'assets/avatar.jpg',
+    registeredDate: '2025-04-15',
+    approvedBy: 'Administrator',
+    approvedDate: '2025-04-15',
+    notes: 'School Music Director with Mass creation and arrangement approval authority.'
+  },
+  {
+    id: 'usr-emmanuel-aidoo',
+    name: 'Fr. Emmanuel K. Aidoo',
+    email: 'chaplain@olagshs.edu.gh',
+    role: 'chaplain',
+    roleLabel: 'School Chaplain & Celebrant',
+    groupName: 'Chaplaincy Department',
+    groupId: null,
+    voicePart: 'Priest Celebrant',
+    status: 'approved',
+    avatar: 'assets/avatar.jpg',
+    registeredDate: '2025-04-10',
+    approvedBy: 'Administrator',
+    approvedDate: '2025-04-11',
+    notes: 'School Chaplain with liturgical readings oversight and pastoral blessing authority.'
+  },
+  {
+    id: 'usr-michael-boateng',
+    name: 'Michael Boateng',
+    email: 'm.boateng@olagshs.edu.gh',
+    role: 'group',
+    roleLabel: 'Music Group Member',
+    groupName: 'Youth Choir',
+    groupId: 'grp-youth-choir',
+    voicePart: 'Tenor / Student Leader',
+    status: 'pending', // PENDING ADMIN APPROVAL
+    avatar: 'assets/avatar.jpg',
+    registeredDate: '2025-05-24',
+    approvedBy: null,
+    approvedDate: null,
+    notes: 'New registration: Awaiting Admin clearance for Youth Choir Pentecost preparation.'
+  },
+  {
+    id: 'usr-peter-obeng',
+    name: 'Rev. Fr. Peter K. Obeng',
+    email: 'p.obeng@catholicgh.org',
+    role: 'chaplain',
+    roleLabel: 'Visiting Priest Celebrant',
+    groupName: 'Visiting Clergy',
+    groupId: null,
+    voicePart: 'Celebrant',
+    status: 'pending', // PENDING ADMIN APPROVAL
+    avatar: 'assets/avatar.jpg',
+    registeredDate: '2025-05-23',
+    approvedBy: null,
+    approvedDate: null,
+    notes: 'Visiting celebrant requesting access to review readings and hymns.'
+  },
+  {
+    id: 'usr-sr-mary-agnes',
+    name: 'Sr. Mary Agnes, HDR',
+    email: 'm.agnes@olagshs.edu.gh',
+    role: 'group',
+    roleLabel: 'Music Group Member',
+    groupName: 'Cantors & Soloists Guild',
+    groupId: 'grp-cantors',
+    voicePart: 'Vocal Coach / Senior Psalmist',
+    status: 'approved',
+    avatar: 'assets/avatar.jpg',
+    registeredDate: '2025-04-20',
+    approvedBy: 'Administrator',
+    approvedDate: '2025-04-21',
+    notes: 'Approved cantor leader.'
+  },
+  {
+    id: 'usr-admin',
+    name: 'System Administrator',
+    email: 'admin@olagshs.edu.gh',
+    role: 'admin',
+    roleLabel: 'System Administrator',
+    groupName: 'Chaplaincy Administration',
+    groupId: null,
+    voicePart: 'Administrator',
+    status: 'approved',
+    avatar: 'assets/avatar.jpg',
+    registeredDate: '2025-01-01',
+    approvedBy: 'Root',
+    approvedDate: '2025-01-01',
+    notes: 'Master administrator with full user approval and access control privileges.'
+  }
 ];
+
+const USER_ROLES = [
+  { id: 'group', title: 'Faith Mensah', subtitle: 'Music Group Member (Approved)', icon: '🎵', badge: 'Music Group', userId: 'usr-faith-mensah' },
+  { id: 'coordinator', title: 'Mr. Gabriel Mensah', subtitle: 'Music Coordinator (Approved)', icon: '📋', badge: 'Coordinator', userId: 'usr-gabriel-mensah' },
+  { id: 'chaplain', title: 'Fr. Emmanuel K. Aidoo', subtitle: 'School Chaplain (Approved)', icon: '✝️', badge: 'Chaplain', userId: 'usr-emmanuel-aidoo' },
+  { id: 'pending-member', title: 'Michael Boateng', subtitle: 'Youth Choir (Pending Approval ⏳)', icon: '⏳', badge: 'Pending Member', userId: 'usr-michael-boateng' },
+  { id: 'pending-chaplain', title: 'Fr. Peter Obeng', subtitle: 'Visiting Priest (Pending Approval ⏳)', icon: '⏳', badge: 'Pending Chaplain', userId: 'usr-peter-obeng' },
+  { id: 'admin', title: 'System Administrator', subtitle: 'System Admin (Approved)', icon: '⚙️', badge: 'Admin', userId: 'usr-admin' }
+];
+

@@ -148,6 +148,15 @@ class LiturgicalAudioSynthesizer {
       this.isPlaying = false;
     }, duration * 1000);
   }
+
+  // Aliases for pitch pipe and key triad
+  playPitchTone(note = 'D4', duration = 3.0) {
+    return this.playPitchPipe(note, duration);
+  }
+
+  playTriad(rootKey = 'D', duration = 3.5) {
+    return this.playKeyTriad(rootKey, duration);
+  }
 }
 
 const audioSynth = new LiturgicalAudioSynthesizer();
