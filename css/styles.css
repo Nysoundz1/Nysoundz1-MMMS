@@ -1864,3 +1864,230 @@ html, body {
     -webkit-print-color-adjust: exact;
   }
 }
+
+/* ==========================================================================
+   CLEAN MODERN LITURGICAL COMPONENT SYSTEM
+   Simple, focused, uncluttered visual hierarchy across all screens
+   ========================================================================== */
+
+/* 1. Compact Action Header (Replaces tall hero banner & ribbon) */
+.compact-action-header {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.compact-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.compact-header-icon {
+  font-size: 1.4rem;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--bg-subtle, #f1f5f9);
+}
+
+.compact-header-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.compact-header-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.15rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.compact-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* 2. Clean Segmented Navigation Bar */
+.clean-segmented-tabs {
+  display: inline-flex;
+  background: var(--bg-subtle, #f1f5f9);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.25rem;
+  gap: 2px;
+}
+
+.clean-tab-pill {
+  border: none;
+  background: transparent;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-radius: calc(var(--radius-md) - 2px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.clean-tab-pill:hover {
+  color: var(--text-main);
+}
+
+.clean-tab-pill.active {
+  background: var(--bg-surface);
+  color: var(--primary-blue, #2563eb);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* 3. 4 Classical Catholic Liturgical Phases */
+.liturgical-phases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.phase-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  transition: border-color 0.15s ease;
+}
+
+.phase-card:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.phase-card-header {
+  padding: 0.75rem 1rem;
+  background: var(--bg-subtle, #f8fafc);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.phase-card-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.phase-song-list {
+  padding: 0.35rem 0;
+}
+
+.phase-song-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.12s ease;
+  gap: 0.5rem;
+}
+
+.phase-song-row:last-child {
+  border-bottom: none;
+}
+
+.phase-song-row:hover {
+  background: var(--bg-subtle, #f8fafc);
+}
+
+.phase-song-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.phase-song-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-subtle, #e2e8f0);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.phase-song-title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.phase-song-part-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* 4. Streamlined Stat Strip */
+.clean-stat-strip {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.65rem 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+}
+
+.clean-stat-unit {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.clean-stat-unit strong {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+

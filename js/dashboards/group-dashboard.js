@@ -1,19 +1,27 @@
-// Dedicated Dashboard Controller for Music Group Members & Choristers
+// Dedicated Dashboard Controller for Music Group Member / Chorister
 // File: js/dashboards/group-dashboard.js
-// Persona: Faith Mensah / Choristers (School Choir, Youth Choir, Chapel Choir, Inspirational Band, Cantors Guild)
+// Persona: Emmanuel Mensah (St. Cecilia Choir - Bass)
+// Aesthetic: Clean, Simple, Focused Rehearsal Desk
 
 class GroupDashboardController {
   constructor() {
-    this.chordTransposeOffset = 0;
-    this.currentSongInModal = null;
+    this.audioCtx = null;
+    this.practicedMap = {};
     this.init();
   }
 
   init() {
-    // Access Guard: Enforce individual Admin approval & group member role (or admin)
+    // Access Guard: Enforce individual Admin approval & group role (or admin)
     if (typeof auth !== 'undefined') {
       const allowed = auth.requireAuth(['group', 'student']);
       if (!allowed) return;
+    }
+
+    // Load saved practiced checklist
+    try {
+      this.practicedMap = JSON.parse(localStorage.getItem('olag_chorister_prep') || '{}');
+    } catch (e) {
+      this.practicedMap = {};
     }
 
     this.render();
@@ -29,354 +37,196 @@ class GroupDashboardController {
     const user = store.getCurrentUser();
     const masses = store.getMasses();
     const arrangements = store.getArrangements();
-    const myGroupId = user.groupId || 'grp-school-choir';
-    const myGroup = store.getGroupById(myGroupId);
-    const assignedMasses = masses.filter(m => m.assignedGroupId === myGroupId);
-    const nextMass = assignedMasses.find(m => m.date >= '2025-05-25') || assignedMasses[0] || masses[0];
-    const targetArr = nextMass ? store.getArrangementById(nextMass.arrangementId) : arrangements[0];
+    const upcoming = masses.find(m => m.date >= '2025-05-25') || masses[0];
+    const targetArr = store.getArrangementById(upcoming.arrangementId) || arrangements[0];
     const songs = targetArr?.songs || {};
 
+    // Calculate practiced readiness
+    const totalParts = 13;
+    const practicedCount = Object.values(this.practicedMap).filter(Boolean).length;
+    const percent = Math.min(100, Math.round((practicedCount / totalParts) * 100));
+
     container.innerHTML = `
-      <!-- Role Quick Actions Ribbon -->
-      <div class="role-quick-ribbon">
-        <div class="quick-ribbon-title">
-          <span>🎵</span> <span>Chorister Rehearsal Shortcuts</span>
-        </div>
-        <div class="quick-ribbon-actions">
-          <button class="quick-action-chip chip-primary" onclick="groupApp.openArrangementEditor()">
-            🎼 Open 13-Part Mass Editor
-          </button>
-          <button class="quick-action-chip" onclick="audioSynth.playPitchTone('G4')">
-            🔊 Sound G4 Pitch
-          </button>
-          <button class="quick-action-chip" onclick="groupApp.openChordModal('song-easter-1')">
-            🎸 Transpose Chords
-          </button>
-          <button class="quick-action-chip" onclick="groupApp.copyWhatsAppSummary('${targetArr?.id || 'arr-2025-05-25'}')">
-            📱 Copy WhatsApp Summary
-          </button>
-        </div>
-      </div>
-
-      <!-- Musician Hero Identity Banner -->
-      <div class="role-hero-banner banner-group">
-        <div>
-          <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">
-            🎵 Choir Loft & Musician Rehearsal Portal
-          </span>
-          <h1 class="role-hero-title">Good day, ${user.name}! 👋</h1>
-          <p class="role-hero-subtitle">
-            ${myGroup ? myGroup.name : 'School Choir'} &bull; ${user.voicePart || 'Soprano Section'} &bull; Rehearse your 13 Mass parts, sound pitch tones, and prepare lead sheets.
-          </p>
-        </div>
-        <div>
-          <button class="btn-primary" style="background: #ffffff; color: #064e3b; border-color: #ffffff;" onclick="groupApp.openArrangementEditor()">
-            🎼 Open 13-Part Arrangement
-          </button>
-        </div>
-      </div>
-
-      <!-- 4 Top Musician Stat Cards -->
-      <div class="dash-stats-row">
-        <div class="stat-item-card">
-          <div class="stat-icon-box stat-icon-blue">📅</div>
-          <div class="stat-content-meta">
-            <span class="stat-label-badge">Next Assigned Mass</span>
-            <div class="stat-main-value">${nextMass ? (nextMass.displayDate || nextMass.date) : 'Sun, 25 May'}</div>
-            <span class="stat-subtext">${nextMass ? nextMass.theme : 'Easter Sunday'}</span>
+      <!-- 1. Sleek Compact Action Header -->
+      <div class="compact-action-header" style="border-left: 4px solid #ea580c;">
+        <div class="compact-header-left">
+          <div class="compact-header-icon" style="background: rgba(234, 88, 12, 0.1); color: #ea580c;">
+            🎵
           </div>
-        </div>
-
-        <div class="stat-item-card">
-          <div class="stat-icon-box stat-icon-green">🎵</div>
-          <div class="stat-content-meta">
-            <span class="stat-label-badge">Arrangement Status</span>
-            <div class="stat-main-value">${targetArr ? targetArr.status.toUpperCase() : 'APPROVED'}</div>
-            <span class="stat-subtext">13 Parts Completed</span>
-          </div>
-        </div>
-
-        <div class="stat-item-card">
-          <div class="stat-icon-box stat-icon-orange">⏰</div>
-          <div class="stat-content-meta">
-            <span class="stat-label-badge">Choir Rehearsal</span>
-            <div class="stat-main-value">Thurs 4:30 PM</div>
-            <span class="stat-subtext">School Chapel</span>
-          </div>
-        </div>
-
-        <div class="stat-item-card">
-          <div class="stat-icon-box stat-icon-purple">🎹</div>
-          <div class="stat-content-meta">
-            <span class="stat-label-badge">Voice Section</span>
-            <div class="stat-main-value">${user.voicePart ? user.voicePart.split(' ')[0] : 'Soprano'}</div>
-            <span class="stat-subtext">SATB Harmonization</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Centerpiece Widget: Interactive 13-Part Rehearsal Prep Card with Embedded Pitch Buttons -->
-      <div class="dash-panel-card" style="margin-bottom: 1.5rem;">
-        <div class="panel-header-row">
           <div>
-            <h3 class="panel-header-title">🎵 13-Part Mass Rehearsal & Pitch Practice Card</h3>
-            <span style="font-size: 0.78rem; color: var(--text-muted);">
-              ${nextMass ? nextMass.theme : 'Easter Sunday'} &bull; Click any hymn's pitch badge to sound its key tone before singing.
-            </span>
+            <h1 class="compact-header-title">${user?.groupName || 'St. Cecilia Choir'} &bull; ${user?.voicePart || 'Bass'}</h1>
+            <div class="compact-header-subtitle">
+              <span>Next Mass: <strong>${upcoming.theme}</strong> (${upcoming.displayDate})</span>
+              <span>•</span>
+              <span class="badge-pill ${percent >= 80 ? 'badge-green' : 'badge-orange'}" style="font-size: 0.7rem;">
+                ${percent}% Readiness (${practicedCount}/${totalParts} Parts Practiced)
+              </span>
+            </div>
           </div>
-          <button class="btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="groupApp.openArrangementEditor()">
-            Open 13-Part Editor &rarr;
+        </div>
+
+        <div class="compact-header-actions">
+          <button class="btn btn-sm btn-outline" onclick="groupApp.copyWhatsAppProgramme()" style="padding: 0.45rem 0.85rem;">
+            📱 WhatsApp Format
+          </button>
+          <button class="btn btn-sm btn-outline" onclick="window.print()" style="padding: 0.45rem 0.85rem;">
+            🖨️ Print Sheet
           </button>
         </div>
+      </div>
 
-        <!-- 13-Part Progress Bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.25rem;">
-          <span>Mass Parts Preparation Progress</span>
-          <span style="color: #10b981;">13 of 13 Parts Complete (100%)</span>
+      <!-- 2. Compact Audio Pitch Pipe Bar -->
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.1rem;">🔔</span>
+          <span style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-main);">Pitch Pipe:</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">(Concert pitch references)</span>
         </div>
-        <div class="prep-progress-bar-wrap">
-          <div class="prep-progress-bar-fill" style="width: 100%;"></div>
-        </div>
-
-        <!-- 13 Mass Parts List with Embedded Web Audio Pitch Triggers -->
-        <div style="display: flex; flex-direction: column; gap: 0.45rem;">
-          ${MASS_PARTS.map(part => {
-            const s = songs[part.id] || { title: 'Assigned Hymn', key: 'G', tempo: 120 };
-            return `
-              <div class="prep-part-item">
-                <div style="display: flex; align-items: center; gap: 0.65rem;">
-                  <span style="font-size: 0.75rem; font-weight: 800; color: #2563eb; width: 22px;">${part.order}.</span>
-                  <div>
-                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">${part.name}</div>
-                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main);">${s.title}</div>
-                  </div>
-                </div>
-
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <button class="pitch-trigger-tag" onclick="audioSynth.playPitchTone('${s.key || 'G'}4')" title="Sound Key ${s.key || 'G'} pitch pipe tone">
-                    🔊 Key ${s.key || 'G'}
-                  </button>
-                  <button class="btn-outline" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="groupApp.openChordModal('${s.songId || 'song-easter-1'}', '${part.id}')" title="View transposable chords">
-                    🎸 Chords
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join('')}
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(261.63, 'C')" style="padding: 0.25rem 0.65rem; font-weight: 700;">C</button>
+          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(293.66, 'D')" style="padding: 0.25rem 0.65rem; font-weight: 700;">D</button>
+          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(329.63, 'E')" style="padding: 0.25rem 0.65rem; font-weight: 700;">E</button>
+          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(349.23, 'F')" style="padding: 0.25rem 0.65rem; font-weight: 700;">F</button>
+          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(392.00, 'G')" style="padding: 0.25rem 0.65rem; font-weight: 700;">G</button>
+          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(440.00, 'A')" style="padding: 0.25rem 0.65rem; font-weight: 700;">A</button>
+          <button class="btn btn-sm btn-outline" onclick="groupApp.playPitch(466.16, 'Bb')" style="padding: 0.25rem 0.65rem; font-weight: 700;">B♭</button>
         </div>
       </div>
 
-      <!-- 2 Panels Row: Next Mass Summary & Musician Audio Synthesizer -->
-      <div class="dash-panels-row">
-        <!-- Left: Next Mass Summary -->
-        <div class="dash-panel-card">
-          <div class="panel-header-row">
-            <h3 class="panel-header-title">Next Celebration Overview</h3>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">Assigned to ${myGroup ? myGroup.name : 'School Choir'}</span>
-          </div>
-
-          <div class="next-mass-content" style="margin-bottom: 1rem;">
-            <img src="assets/chalice.jpg" alt="Chalice" class="next-mass-thumb-img">
-            <div class="next-mass-details">
-              <div>
-                <h4 class="next-mass-name">${nextMass ? nextMass.theme : 'Easter Sunday'}</h4>
-                <div class="next-mass-metadata">
-                  <div>👤 <strong>Celebrant:</strong> ${nextMass ? nextMass.celebrant : 'Fr. Emmanuel K. Aidoo'}</div>
-                  <div>🏛️ <strong>Venue:</strong> ${nextMass ? nextMass.venue : 'School Chapel'}</div>
-                  <div>🌿 <strong>Liturgical Season:</strong> ${nextMass ? nextMass.season : 'Easter'}</div>
-                </div>
-              </div>
-              <div class="next-mass-status-badge">
-                <span class="badge-pill badge-green">Approved Official Programme</span>
-              </div>
-            </div>
-          </div>
-
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button class="btn-primary" onclick="groupApp.openArrangementEditor()">
-              Open 13-Part Editor &rarr;
-            </button>
-            <button class="btn-outline" onclick="groupApp.copyWhatsAppSummary('${targetArr?.id || 'arr-2025-05-25'}')">
-              📱 Copy WhatsApp Summary
-            </button>
-          </div>
-        </div>
-
-        <!-- Right: Choir Loft Pitch Synthesizer -->
-        <div class="dash-panel-card">
-          <div class="panel-header-row">
-            <h3 class="panel-header-title">Choir Loft Musician Toolkit</h3>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">Web Audio Synthesizer</span>
-          </div>
-
-          <!-- Pitch Pipe Quick Generator -->
-          <div style="background: var(--bg-surface-subtle); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
-            <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
-              🎵 Concert Pitch Pipe Tone Generator:
-            </label>
-            <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.75rem;">
-              Click any note to sound reference pitch tone before your choir sings:
-            </p>
-
-            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
-              <button class="pitch-pipe-btn" onclick="audioSynth.playPitchTone('C4')">C</button>
-              <button class="pitch-pipe-btn" onclick="audioSynth.playPitchTone('D4')">D</button>
-              <button class="pitch-pipe-btn" onclick="audioSynth.playPitchTone('Eb4')">Eb</button>
-              <button class="pitch-pipe-btn" onclick="audioSynth.playPitchTone('F4')">F</button>
-              <button class="pitch-pipe-btn" onclick="audioSynth.playPitchTone('G4')">G</button>
-              <button class="pitch-pipe-btn" onclick="audioSynth.playPitchTone('A4')">A</button>
-              <button class="pitch-pipe-btn" onclick="audioSynth.playPitchTone('Bb4')">Bb</button>
-            </div>
-
-            <div style="display: flex; gap: 0.5rem;">
-              <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="audioSynth.playTriad('G')">
-                🎶 Sound G Major Triad
-              </button>
-              <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="audioSynth.playTriad('D')">
-                🎶 Sound D Major Triad
-              </button>
-            </div>
-          </div>
-
-          <!-- Transposable Chords Quick Shortcut -->
-          <div style="background: var(--bg-surface-subtle); padding: 1rem; border-radius: var(--radius-md);">
-            <strong style="font-size: 0.85rem; color: var(--text-main);">🎸 Transposable Chords & Lead Sheets</strong>
-            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; margin-bottom: 0.75rem;">
-              Quickly transpose chords into any key for keyboard, guitar, or brass accompanists.
-            </p>
-            <button class="btn-primary" style="font-size: 0.75rem; width: 100%;" onclick="groupApp.openChordModal('song-easter-1')">
-              Open Chord Viewer & Transposer
-            </button>
-          </div>
-        </div>
-      </div>
+      <!-- 3. 4 Classical Liturgical Phases with Rehearsal Readiness Checks -->
+      ${this.renderPhasesRehearsalGrid(songs)}
     `;
   }
 
-  openArrangementEditor() {
-    window.location.href = 'index.html#arrangement';
-  }
-
-  // --- Transposable Chord Modal ---
-  openChordModal(songId, partId = null) {
-    const songs = store.getSongs();
-    const song = songs.find(s => s.id === songId) || songs[0];
-    this.currentSongInModal = song;
-    this.chordTransposeOffset = 0;
-
-    const modal = document.getElementById('chord-viewer-modal');
-    if (!modal) {
-      alert(`Song: ${song.title} (Key ${song.key})\n\n${song.chords || song.lyrics}`);
-      return;
-    }
-
-    this.renderChordModalContent();
-    modal.classList.add('active');
-  }
-
-  closeChordModal() {
-    const modal = document.getElementById('chord-viewer-modal');
-    if (modal) modal.classList.remove('active');
-  }
-
-  renderChordModalContent() {
-    const song = this.currentSongInModal;
-    const content = document.getElementById('chord-modal-content');
-    if (!content || !song) return;
-
-    const scale = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
-    let idx = scale.indexOf(song.key);
-    let transposedKey = song.key;
-    if (idx !== -1) {
-      let newIdx = (idx + this.chordTransposeOffset) % 12;
-      if (newIdx < 0) newIdx += 12;
-      transposedKey = scale[newIdx];
-    }
-
-    content.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-        <div>
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">${song.title}</h3>
-          <p style="font-size: 0.78rem; color: var(--text-muted);">Composer: ${song.composer} &bull; Key: <strong>${transposedKey}</strong> &bull; Tempo: ${song.tempo || '100'} BPM</p>
-        </div>
-      </div>
-
-      <!-- Controls -->
-      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center;">
-        <button class="btn-outline" style="padding: 0.3rem 0.65rem; font-size: 0.8rem;" onclick="groupApp.shiftTranspose(-1)">♭ -1</button>
-        <button class="btn-outline" style="padding: 0.3rem 0.65rem; font-size: 0.8rem;" onclick="groupApp.resetTranspose()">Reset Key</button>
-        <button class="btn-outline" style="padding: 0.3rem 0.65rem; font-size: 0.8rem;" onclick="groupApp.shiftTranspose(1)">♯ +1</button>
-        <button class="btn-primary" style="padding: 0.3rem 0.75rem; font-size: 0.8rem; margin-left: auto;" onclick="audioSynth.playPitchTone('${transposedKey}4')">
-          🔊 Sound Pitch (${transposedKey})
-        </button>
-      </div>
-
-      <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.7; white-space: pre-wrap; max-height: 320px; overflow-y: auto;">
-${song.chords || song.lyrics}
-      </div>
-    `;
-  }
-
-  shiftTranspose(delta) {
-    this.chordTransposeOffset += delta;
-    this.renderChordModalContent();
-  }
-
-  resetTranspose() {
-    this.chordTransposeOffset = 0;
-    this.renderChordModalContent();
-  }
-
-  copyWhatsAppSummary(arrId) {
-    const arr = store.getArrangementById(arrId) || DEFAULT_ARRANGEMENTS[0];
-    const mass = store.getMassById(arr.massId);
-    const group = store.getGroupById(arr.groupId);
-
-    let text = `⛪ *OUR LADY OF GRACE SENIOR HIGH SCHOOL (OLAG)*\n` +
-      `🎵 *SCHOOL MASS MUSIC MANAGEMENT SYSTEM (SMMMS)*\n` +
-      `════════════════════════════\n` +
-      `📅 *Occasion:* ${mass ? mass.theme : arr.massTitle} (${mass ? (mass.displayDate || mass.date) : arr.massDisplayDate})\n` +
-      `⏰ *Time:* ${mass ? mass.time : '7:00 AM'} • ${mass ? mass.venue : 'School Chapel'}\n` +
-      `✝️ *Celebrant:* ${mass ? mass.celebrant : 'Fr. Emmanuel K. Aidoo'}\n` +
-      `👥 *Choir:* ${group ? group.name : arr.groupName}\n` +
-      `════════════════════════════\n`;
-
-    MASS_PARTS.forEach(part => {
-      const s = arr.songs ? arr.songs[part.id] : null;
-      if (s && s.title) {
-        text += `${part.order}. ${part.name}: *${s.title}* (Key ${s.key || 'G'}, ${s.timeSig || '4/4'})\n`;
+  renderPhasesRehearsalGrid(songs) {
+    const phases = [
+      {
+        name: '1. Introductory Rites',
+        color: '#6366f1',
+        parts: [
+          { key: 'entrance', num: 1, label: 'Entrance Hymn', song: songs.entrance },
+          { key: 'kyrie', num: 2, label: 'Penitential Rite (Kyrie)', song: songs.kyrie },
+          { key: 'gloria', num: 3, label: 'Gloria', song: songs.gloria }
+        ]
+      },
+      {
+        name: '2. Liturgy of the Word',
+        color: '#059669',
+        parts: [
+          { key: 'psalm', num: 4, label: 'Responsorial Psalm', song: songs.psalm },
+          { key: 'alleluia', num: 5, label: 'Gospel Acclamation', song: songs.alleluia }
+        ]
+      },
+      {
+        name: '3. Liturgy of the Eucharist',
+        color: '#ea580c',
+        parts: [
+          { key: 'offertory', num: 6, label: 'Offertory Hymn', song: songs.offertory },
+          { key: 'sanctus', num: 7, label: 'Sanctus (Holy, Holy)', song: songs.sanctus },
+          { key: 'mystery', num: 8, label: 'Memorial Acclamation', song: songs.mystery },
+          { key: 'amen', num: 9, label: 'Great Amen', song: songs.amen },
+          { key: 'agnus', num: 10, label: 'Agnus Dei (Lamb of God)', song: songs.agnus },
+          { key: 'communion', num: 11, label: 'Communion Hymn', song: songs.communion },
+          { key: 'thanksgiving', num: 12, label: 'Thanksgiving Hymn', song: songs.thanksgiving }
+        ]
+      },
+      {
+        name: '4. Concluding Rites',
+        color: '#7c3aed',
+        parts: [
+          { key: 'recessional', num: 13, label: 'Recessional Hymn', song: songs.recessional }
+        ]
       }
-    });
+    ];
 
-    text += `════════════════════════════\n` +
-      `Status: *${arr.status === 'approved' ? 'APPROVED OFFICIAL PROGRAMME ✅' : 'PENDING REVIEW ⏳'}*`;
-
-    navigator.clipboard.writeText(text).then(() => {
-      this.showToast('Copied WhatsApp summary to clipboard!', 'success');
-    }).catch(() => {
-      alert(text);
-    });
+    return `
+      <div class="liturgical-phases-grid">
+        ${phases.map(p => `
+          <div class="phase-card">
+            <div class="phase-card-header" style="border-top: 3px solid ${p.color};">
+              <h3 class="phase-card-title">${p.name}</h3>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">${p.parts.length} Songs</span>
+            </div>
+            <div class="phase-song-list">
+              ${p.parts.map(item => {
+                const isPracticed = !!this.practicedMap[item.key];
+                return `
+                  <div class="phase-song-row" style="${isPracticed ? 'background: rgba(16, 185, 129, 0.04);' : ''}">
+                    <div class="phase-song-meta">
+                      <input type="checkbox"
+                        id="chk-${item.key}"
+                        ${isPracticed ? 'checked' : ''}
+                        onchange="groupApp.togglePracticed('${item.key}')"
+                        style="cursor: pointer; width: 16px; height: 16px; accent-color: #10b981;"
+                        title="Mark as practiced"
+                      />
+                      <span class="phase-song-num">${item.num}</span>
+                      <div style="min-width: 0;">
+                        <div class="phase-song-title" style="${isPracticed ? 'text-decoration: line-through; opacity: 0.75;' : ''}">
+                          ${item.song?.title || 'Selection Pending'}
+                        </div>
+                        <div class="phase-song-part-label">${item.label}</div>
+                      </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                      <span class="badge-pill" style="font-size: 0.68rem; padding: 2px 6px;">
+                        ${item.song?.key || 'Key C'}
+                      </span>
+                      <button class="btn btn-sm btn-outline" onclick="groupApp.previewChords('${item.song?.title || item.label}', '${item.song?.key || 'C'}')" style="font-size: 0.72rem; padding: 0.2rem 0.45rem;" title="View chords and lyrics">
+                        👁️ Chords
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
   }
 
-  showToast(message, type = 'info') {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
+  togglePracticed(key) {
+    this.practicedMap[key] = !this.practicedMap[key];
+    try {
+      localStorage.setItem('olag_chorister_prep', JSON.stringify(this.practicedMap));
+    } catch (e) {}
+    this.render();
+  }
 
-    const toast = document.createElement('div');
-    toast.className = 'toast-msg';
-    const icon = type === 'success' ? '✅' : 'ℹ️';
-    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+  playPitch(freq, noteName) {
+    try {
+      if (!this.audioCtx) {
+        this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 1.5);
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+      osc.start();
+      osc.stop(this.audioCtx.currentTime + 1.5);
+    } catch (e) {
+      console.warn('Audio play error:', e);
+    }
+  }
 
-    container.appendChild(toast);
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transition = 'all 0.25s ease';
-      setTimeout(() => toast.remove(), 250);
-    }, 3200);
+  previewChords(title, key) {
+    alert(`🎵 Hymn: "${title}"\nKey: ${key} • Tempo: 84 BPM\n\n[Intro]: ${key} - G - Am - F\nVerse 1: Praise to the Lord, the Almighty, the King of Creation...\nChorus: Praise Him, praise Him in the choir loft!`);
+  }
+
+  copyWhatsAppProgramme() {
+    const text = `OLAG SHS Rehearsal Desk\nSolemnity of the Most Holy Trinity\nChorister Readiness Update:\n• 1. Entrance: Holy, Holy, Holy (Key D)\n• 4. Psalm: Psalm 8 (Key F)\n• 6. Offertory: Take and Sanctify (Key G)\n• 11. Communion: Panis Angelicus (Key F)\n• 13. Recessional: Holy God We Praise Thy Name (Key F)`;
+    navigator.clipboard?.writeText(text);
+    alert('WhatsApp summary copied to clipboard!');
   }
 }
 
-let groupApp;
-document.addEventListener('DOMContentLoaded', () => {
-  groupApp = new GroupDashboardController();
-});
+// Global instance
+const groupApp = new GroupDashboardController();

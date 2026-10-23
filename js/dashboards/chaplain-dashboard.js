@@ -1,9 +1,11 @@
 // Dedicated Dashboard Controller for School Chaplain & Priest Celebrant
 // File: js/dashboards/chaplain-dashboard.js
 // Persona: Fr. Emmanuel K. Aidoo (School Chaplain & Celebrant)
+// Aesthetic: Clean, Simple, Focused Liturgical Catholic Experience
 
 class ChaplainDashboardController {
   constructor() {
+    this.activeTab = 'readings'; // 'readings' | 'phases' | 'notes'
     this.init();
   }
 
@@ -20,385 +22,276 @@ class ChaplainDashboardController {
     }
   }
 
+  setTab(tab) {
+    this.activeTab = tab;
+    this.render();
+  }
+
   render() {
     const container = document.getElementById('chaplain-dashboard-container');
     if (!container) return;
 
-    const user = store.getCurrentUser();
     const masses = store.getMasses();
     const arrangements = store.getArrangements();
     const myMasses = masses.filter(m => m.celebrant && m.celebrant.includes('Aidoo'));
     const nextCelebration = myMasses.find(m => m.date >= '2025-05-25') || myMasses[0] || masses[0];
-    const endorsedCount = masses.filter(m => m.chaplainEndorsed).length;
-    const pendingEndorseCount = masses.filter(m => !m.chaplainEndorsed && m.status === 'approved').length;
     const targetArr = store.getArrangementById(nextCelebration.arrangementId) || arrangements[0];
     const songs = targetArr?.songs || {};
 
+    const isEndorsed = nextCelebration.chaplainEndorsed;
+
     container.innerHTML = `
-      <!-- Role Quick Actions Ribbon -->
-      <div class="role-quick-ribbon">
-        <div class="quick-ribbon-title">
-          <span>✝️</span> <span>Chaplaincy Pastoral Shortcuts</span>
+      <!-- 1. Sleek Compact Action Header -->
+      <div class="compact-action-header" style="border-left: 4px solid #7c3aed;">
+        <div class="compact-header-left">
+          <div class="compact-header-icon" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed;">
+            ✝️
+          </div>
+          <div>
+            <h1 class="compact-header-title">${nextCelebration.theme}</h1>
+            <div class="compact-header-subtitle">
+              <span>📅 ${nextCelebration.displayDate} • ${nextCelebration.time}</span>
+              <span>•</span>
+              <span>👥 Choir: <strong>${nextCelebration.assignedGroupName || 'Marian Voices'}</strong></span>
+              <span>•</span>
+              <span>${isEndorsed ? '<span class="badge-pill badge-green" style="font-size: 0.7rem;">✝️ Pastoral Blessing Granted</span>' : '<span class="badge-pill badge-orange" style="font-size: 0.7rem;">⏳ Endorsement Pending</span>'}</span>
+            </div>
+          </div>
         </div>
-        <div class="quick-ribbon-actions">
-          <button class="quick-action-chip chip-primary" onclick="chaplainApp.scrollToReadings()">
-            📖 Sunday Lectionary Readings
-          </button>
-          <button class="quick-action-chip" onclick="chaplainApp.openChaplainNotesModal('${nextCelebration.id}')">
-            ✍️ Celebrant Note to Choir
-          </button>
-          <button class="quick-action-chip chip-green" onclick="chaplainApp.openChaplainEndorseModal('${nextCelebration.id}')">
-            ✝️ Grant Pastoral Blessing
-          </button>
-          <button class="quick-action-chip" onclick="chaplainApp.printCurrentProgramme()">
+
+        <div class="compact-header-actions">
+          ${!isEndorsed ? `
+            <button class="btn btn-sm btn-primary" onclick="chaplainApp.openChaplainEndorseModal('${nextCelebration.id}')" style="background: #059669; border-color: #059669; padding: 0.45rem 0.85rem;">
+              ✝️ Grant Pastoral Blessing
+            </button>
+          ` : `
+            <button class="btn btn-sm btn-outline" onclick="chaplainApp.openChaplainNotesModal('${nextCelebration.id}')" style="padding: 0.45rem 0.85rem;">
+              ✍️ Celebrant Directives
+            </button>
+          `}
+          <button class="btn btn-sm btn-outline" onclick="chaplainApp.printCurrentProgramme()" style="padding: 0.45rem 0.85rem;">
             🖨️ Print Leaflet
           </button>
         </div>
       </div>
 
-      <!-- Chaplain Hero Identity Banner with Dynamic Liturgical Season -->
-      <div class="role-hero-banner banner-chaplain">
-        <div>
-          <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">
-            ✝️ Catholic Liturgical & Pastoral Oversight
-          </span>
-          <h1 class="role-hero-title">Pax Christi, ${user.name} 👋</h1>
-          <p class="role-hero-subtitle">
-            School Chaplain & Priest Celebrant &bull; Oversee sacred Scripture readings, verify hymn theological harmony, and grant pastoral liturgical blessings.
+      <!-- 2. Clean Segmented Focus Tabs -->
+      <div class="clean-segmented-tabs">
+        <button class="clean-tab-pill ${this.activeTab === 'readings' ? 'active' : ''}" onclick="chaplainApp.setTab('readings')">
+          📖 Sunday Lectionary Readings (Year C)
+        </button>
+        <button class="clean-tab-pill ${this.activeTab === 'phases' ? 'active' : ''}" onclick="chaplainApp.setTab('phases')">
+          🎼 4 Liturgical Rites & Hymns
+        </button>
+        <button class="clean-tab-pill ${this.activeTab === 'notes' ? 'active' : ''}" onclick="chaplainApp.setTab('notes')">
+          ✍️ Celebrant Directives (${nextCelebration.chaplainNotes ? '1' : '0'})
+        </button>
+      </div>
+
+      <!-- 3. Focused Tab Content -->
+      ${this.activeTab === 'readings' ? this.renderReadingsTab(nextCelebration, songs) : ''}
+      ${this.activeTab === 'phases' ? this.renderPhasesTab(songs) : ''}
+      ${this.activeTab === 'notes' ? this.renderNotesTab(nextCelebration) : ''}
+    `;
+  }
+
+  // TAB 1: Sunday Lectionary Scripture Readings & Theological Alignment
+  renderReadingsTab(mass, songs) {
+    return `
+      <!-- Theological Alignment Highlight Callout -->
+      <div style="background: rgba(124, 58, 237, 0.05); border: 1px solid rgba(124, 58, 237, 0.2); border-radius: var(--radius-md); padding: 0.85rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="font-size: 0.85rem; color: var(--text-main);">
+          <strong>🕊️ Theological Hymn Alignment:</strong> Entrance hymn <em>"${songs.entrance?.title || 'Holy, Holy, Holy'}"</em> & Communion hymn <em>"${songs.communion?.title || 'Panis Angelicus'}"</em> directly reflect today's Trinitarian Gospel (John 16:12-15).
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="chaplainApp.setTab('phases')" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">
+          View All 13 Hymn Parts →
+        </button>
+      </div>
+
+      <!-- 4 Scripture Readings Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+        <!-- 1st Reading -->
+        <div class="card" style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <span class="badge-pill badge-purple" style="font-size: 0.7rem;">First Reading</span>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #7c3aed;">Proverbs 8:22-31</span>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.55; margin: 0;">
+            <em>"The Lord created me at the beginning of his work, the first of his acts of long ago. Before the mountains were settled, I was brought forth..."</em>
           </p>
         </div>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <span class="vestment-tag" style="background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.3);">
-            ⚪ Vestment: White & Gold
-          </span>
-          <span class="vestment-tag" style="background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.3);">
-            🌅 Easter Season (Year C)
-          </span>
-        </div>
-      </div>
 
-      <!-- 4 Top Chaplain Stat Cards -->
-      <div class="dash-stats-row">
-        <div class="stat-item-card">
-          <div class="stat-icon-box stat-icon-blue">✝️</div>
-          <div class="stat-content-meta">
-            <span class="stat-label-badge">Masses as Celebrant</span>
-            <div class="stat-main-value">${myMasses.length} Masses</div>
-            <span class="stat-subtext">School Chapel</span>
+        <!-- Responsorial Psalm -->
+        <div class="card" style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <span class="badge-pill badge-blue" style="font-size: 0.7rem;">Responsorial Psalm</span>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #2563eb;">Psalm 8:4-9</span>
           </div>
+          <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.55; margin: 0;">
+            <strong>Response:</strong> <em>"O Lord, our God, how majestic is your name through all the earth!"</em>
+          </p>
         </div>
 
-        <div class="stat-item-card">
-          <div class="stat-icon-box stat-icon-green">📜</div>
-          <div class="stat-content-meta">
-            <span class="stat-label-badge">Liturgical Readings</span>
-            <div class="stat-main-value">Year C</div>
-            <span class="stat-subtext">Lectionary Alignment</span>
+        <!-- 2nd Reading -->
+        <div class="card" style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <span class="badge-pill badge-purple" style="font-size: 0.7rem;">Second Reading</span>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #7c3aed;">Romans 5:1-5</span>
           </div>
+          <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.55; margin: 0;">
+            <em>"Since we are justified by faith, we have peace with God through our Lord Jesus Christ... God's love has been poured into our hearts through the Holy Spirit."</em>
+          </p>
         </div>
 
-        <div class="stat-item-card">
-          <div class="stat-icon-box stat-icon-orange">🕊️</div>
-          <div class="stat-content-meta">
-            <span class="stat-label-badge">Pastoral Endorsements</span>
-            <div class="stat-main-value">${endorsedCount} Endorsed</div>
-            <span class="stat-subtext">${pendingEndorseCount} Awaiting blessing</span>
+        <!-- Gospel Passage -->
+        <div class="card" style="padding: 1.25rem; border-left: 4px solid #ea580c;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <span class="badge-pill badge-orange" style="font-size: 0.7rem;">Holy Gospel</span>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #ea580c;">John 16:12-15</span>
           </div>
+          <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.55; margin: 0;">
+            <em>"When the Spirit of truth comes, he will guide you into all the truth. He will not speak on his own, but will speak whatever he hears... All that the Father has is mine."</em>
+          </p>
         </div>
-
-        <div class="stat-item-card">
-          <div class="stat-icon-box stat-icon-purple">👥</div>
-          <div class="stat-content-meta">
-            <span class="stat-label-badge">Ministering Choirs</span>
-            <div class="stat-main-value">5 Groups</div>
-            <span class="stat-subtext">Liturgical ministries</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Centerpiece Widget: Side-by-Side Scripture & Hymn Theological Alignment -->
-      <div class="dash-panel-card" id="scripture-alignment-panel" style="margin-bottom: 1.5rem;">
-        <div class="panel-header-row">
-          <div>
-            <h3 class="panel-header-title">📖 Sunday Lectionary Readings & Hymn Theological Alignment</h3>
-            <span style="font-size: 0.78rem; color: var(--text-muted);">
-              ${nextCelebration.theme} &bull; ${nextCelebration.displayDate || nextCelebration.date} &bull; St. Thomas Aquinas Chapel
-            </span>
-          </div>
-          <div style="display: flex; gap: 0.5rem;">
-            ${nextCelebration.chaplainEndorsed ? `
-              <span class="pastoral-endorsement-badge">✝️ Pastoral Blessing Granted</span>
-            ` : `
-              <button class="btn-primary" style="font-size: 0.75rem; background: #10b981; border-color: #10b981;" onclick="chaplainApp.openChaplainEndorseModal('${nextCelebration.id}')">
-                ✝️ Grant Pastoral Blessing
-              </button>
-            `}
-            <button class="btn-outline" style="font-size: 0.75rem;" onclick="chaplainApp.openChaplainNotesModal('${nextCelebration.id}')">
-              ✍️ Celebrant Note
-            </button>
-          </div>
-        </div>
-
-        <div class="scripture-hymn-split">
-          <!-- Left: Lectionary Readings (Year C) -->
-          <div class="scripture-column">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <strong style="font-size: 0.88rem; color: var(--text-main);">📜 Holy Scripture Readings (Lectionary)</strong>
-              <span class="badge-pill badge-blue" style="font-size: 0.68rem;">Year C</span>
-            </div>
-
-            <div class="scripture-reading-item">
-              <div style="font-size: 0.72rem; font-weight: 700; color: #2563eb; text-transform: uppercase;">First Reading</div>
-              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">Acts 10:34a, 37-43</div>
-              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">
-                "Peter proceeded to speak and said: 'You know what has happened all over Judea... He commissioned us to preach to the people and testify that he is the one appointed by God as judge of the living and the dead.'"
-              </div>
-            </div>
-
-            <div class="scripture-reading-item" style="border-left-color: #10b981;">
-              <div style="font-size: 0.72rem; font-weight: 700; color: #10b981; text-transform: uppercase;">Responsorial Psalm</div>
-              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">Psalm 118: 1-2, 16-17, 22-23</div>
-              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">
-                <strong>Response:</strong> <em>"This is the day the Lord has made; let us rejoice and be glad in it."</em>
-              </div>
-            </div>
-
-            <div class="scripture-reading-item" style="border-left-color: #8b5cf6;">
-              <div style="font-size: 0.72rem; font-weight: 700; color: #8b5cf6; text-transform: uppercase;">Second Reading</div>
-              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">Colossians 3:1-4</div>
-              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">
-                "Brothers and sisters: If then you were raised with Christ, seek what is above, where Christ is seated at the right hand of God."
-              </div>
-            </div>
-
-            <div class="scripture-reading-item" style="border-left-color: #dc2626;">
-              <div style="font-size: 0.72rem; font-weight: 700; color: #dc2626; text-transform: uppercase;">Holy Gospel</div>
-              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">John 20:1-9</div>
-              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">
-                "On the first day of the week, Mary of Magdala came to the tomb early in the morning, while it was still dark, and saw the stone removed from the tomb."
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: Choir Hymns Selected (Theological Match) -->
-          <div class="hymn-column">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <strong style="font-size: 0.88rem; color: var(--text-main);">🎵 Choir Selected Hymns</strong>
-              <span class="badge-pill badge-green" style="font-size: 0.68rem;">School Choir</span>
-            </div>
-
-            <div class="hymn-align-row">
-              <div>
-                <div style="font-size: 0.7rem; font-weight: 700; color: #2563eb;">1. Entrance Hymn</div>
-                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.entrance?.title || 'Christ the Lord Is Risen Today'}</div>
-                <div style="font-size: 0.68rem; color: var(--text-muted);">Theological Theme: Resurrection Proclamation</div>
-              </div>
-              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Conforms ✅</span>
-            </div>
-
-            <div class="hymn-align-row">
-              <div>
-                <div style="font-size: 0.7rem; font-weight: 700; color: #10b981;">4. Responsorial Psalm</div>
-                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.psalm?.title || 'Psalm 118: This Is the Day'}</div>
-                <div style="font-size: 0.68rem; color: var(--text-muted);">Matches Lectionary Response exact text</div>
-              </div>
-              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Direct Match ✅</span>
-            </div>
-
-            <div class="hymn-align-row">
-              <div>
-                <div style="font-size: 0.7rem; font-weight: 700; color: #8b5cf6;">6. Offertory Hymn</div>
-                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.offertory?.title || 'Take Our Bread'}</div>
-                <div style="font-size: 0.68rem; color: var(--text-muted);">Sacrificial Presentation of Gifts</div>
-              </div>
-              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Conforms ✅</span>
-            </div>
-
-            <div class="hymn-align-row">
-              <div>
-                <div style="font-size: 0.7rem; font-weight: 700; color: #dc2626;">11. Communion Hymn</div>
-                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.communion?.title || 'I Am the Bread of Life'}</div>
-                <div style="font-size: 0.68rem; color: var(--text-muted);">Eucharistic Solemnity & Reverence</div>
-              </div>
-              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Conforms ✅</span>
-            </div>
-
-            <div class="hymn-align-row">
-              <div>
-                <div style="font-size: 0.7rem; font-weight: 700; color: #d97706;">13. Recessional Hymn</div>
-                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.recessional?.title || 'Sing with All the Saints in Glory'}</div>
-                <div style="font-size: 0.68rem; color: var(--text-muted);">Easter Mission Sending Forth</div>
-              </div>
-              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Conforms ✅</span>
-            </div>
-
-            <div style="margin-top: 0.85rem; display: flex; gap: 0.5rem;">
-              <button class="btn-primary" style="flex: 1; font-size: 0.75rem;" onclick="chaplainApp.openAll13PartsModal()">
-                Inspect Full 13-Part Score &rarr;
-              </button>
-              <button class="btn-outline" style="font-size: 0.75rem;" onclick="chaplainApp.printCurrentProgramme()">
-                🖨️ Print Order of Service
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Celebrant Upcoming Liturgies List -->
-      <div class="dash-panel-card" style="margin-bottom: 1.5rem;">
-        <div class="panel-header-row">
-          <h3 class="panel-header-title">Celebrant Upcoming Masses & Ministries on Duty</h3>
-          <span style="font-size: 0.78rem; color: var(--text-muted);">School Chapel &bull; OLAG SHS</span>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-          ${masses.slice(0, 3).map(m => {
-            const group = store.getGroupById(m.assignedGroupId);
-            return `
-              <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.95rem;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.4rem;">
-                  <div>
-                    <h4 style="font-size: 0.98rem; font-weight: 800; color: var(--text-main);">${m.theme}</h4>
-                    <div style="font-size: 0.78rem; color: var(--text-muted);">
-                      📅 ${m.displayDate || m.date} &bull; ⏰ ${m.time} &bull; 🏛️ ${m.venue}
-                    </div>
-                  </div>
-                  <div style="display: flex; gap: 0.35rem; align-items: center;">
-                    <span class="vestment-tag">${m.vestmentIcon || '⚪'} ${m.vestment || 'White'}</span>
-                    ${m.chaplainEndorsed ? `
-                      <span class="pastoral-endorsement-badge">✝️ Pastoral Blessing Granted</span>
-                    ` : `
-                      <button class="btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: #10b981; border-color: #10b981;" onclick="chaplainApp.openChaplainEndorseModal('${m.id}')">
-                        ✝️ Endorse
-                      </button>
-                    `}
-                  </div>
-                </div>
-
-                <div class="readings-box-strip">
-                  📖 <strong>Liturgical Readings:</strong> ${m.readings || 'Proper readings for the Sunday'}
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; font-size: 0.78rem;">
-                  <div>👥 <strong>Music Group:</strong> ${group ? group.name : 'School Choir'}</div>
-                  <button class="btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;" onclick="chaplainApp.openChaplainNotesModal('${m.id}')">
-                    ✍️ Celebrant Instructions
-                  </button>
-                </div>
-
-                ${m.chaplainNotes ? `
-                  <div style="margin-top: 0.45rem; font-size: 0.75rem; color: #b45309; background: #fef3c7; padding: 0.35rem 0.65rem; border-radius: 4px;">
-                    💬 <strong>Celebrant Note to Choir:</strong> "${m.chaplainNotes}"
-                  </div>
-                ` : ''}
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-
-      <!-- Sacred Music Pastoral Guidance Reminder -->
-      <div class="reminder-banner">
-        <span style="font-size: 1.1rem;">✝️</span>
-        <span>
-          <strong>Pastoral Guidance for Liturgical Music:</strong> Sacred music in the Catholic liturgy serves the glory of God and the sanctification of the faithful. Ensure all chosen texts are rooted in Holy Scripture and liturgical tradition.
-        </span>
       </div>
     `;
   }
 
-  scrollToReadings() {
-    document.getElementById('scripture-alignment-panel')?.scrollIntoView({ behavior: 'smooth' });
+  // TAB 2: The 13 Mass Parts Grouped into 4 Classical Catholic Liturgical Phases
+  renderPhasesTab(songs) {
+    const phases = [
+      {
+        name: '1. Introductory Rites',
+        color: '#6366f1',
+        parts: [
+          { num: 1, name: 'Entrance Hymn', song: songs.entrance },
+          { num: 2, name: 'Penitential Rite (Kyrie)', song: songs.kyrie },
+          { num: 3, name: 'Gloria', song: songs.gloria }
+        ]
+      },
+      {
+        name: '2. Liturgy of the Word',
+        color: '#059669',
+        parts: [
+          { num: 4, name: 'Responsorial Psalm', song: songs.psalm },
+          { num: 5, name: 'Gospel Acclamation', song: songs.alleluia }
+        ]
+      },
+      {
+        name: '3. Liturgy of the Eucharist',
+        color: '#ea580c',
+        parts: [
+          { num: 6, name: 'Offertory Hymn', song: songs.offertory },
+          { num: 7, name: 'Sanctus (Holy, Holy)', song: songs.sanctus },
+          { num: 8, name: 'Memorial Acclamation', song: songs.mystery },
+          { num: 9, name: 'Great Amen', song: songs.amen },
+          { num: 10, name: 'Agnus Dei (Lamb of God)', song: songs.agnus },
+          { num: 11, name: 'Communion Hymn', song: songs.communion },
+          { num: 12, name: 'Thanksgiving Hymn', song: songs.thanksgiving }
+        ]
+      },
+      {
+        name: '4. Concluding Rites',
+        color: '#7c3aed',
+        parts: [
+          { num: 13, name: 'Recessional Hymn', song: songs.recessional }
+        ]
+      }
+    ];
+
+    return `
+      <div class="liturgical-phases-grid">
+        ${phases.map(p => `
+          <div class="phase-card">
+            <div class="phase-card-header" style="border-top: 3px solid ${p.color};">
+              <h3 class="phase-card-title">${p.name}</h3>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">${p.parts.length} Songs</span>
+            </div>
+            <div class="phase-song-list">
+              ${p.parts.map(item => `
+                <div class="phase-song-row">
+                  <div class="phase-song-meta">
+                    <span class="phase-song-num">${item.num}</span>
+                    <div>
+                      <div class="phase-song-title">${item.song?.title || 'Selection Pending'}</div>
+                      <div class="phase-song-part-label">${item.name}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="badge-pill" style="font-size: 0.68rem; padding: 2px 6px;">
+                      ${item.song?.key || 'Key C'}
+                    </span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
   }
 
-  openAll13PartsModal() {
-    window.location.href = 'index.html#arrangement';
+  // TAB 3: Celebrant Directives & Pastoral Notes
+  renderNotesTab(mass) {
+    return `
+      <div class="card" style="max-width: 680px; margin: 0 auto; padding: 1.5rem;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0 0 0.5rem;">
+          ✍️ Celebrant Note & Instructions to Music Director
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          These pastoral instructions appear at the top of the choir director's console and rehearsal sheets.
+        </p>
+
+        <div style="background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+          ${mass.chaplainNotes ? `
+            <div style="font-size: 0.9rem; color: var(--text-main); line-height: 1.6;">
+              "${mass.chaplainNotes}"
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+              — Fr. Emmanuel K. Aidoo (School Chaplain)
+            </div>
+          ` : `
+            <div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">
+              No special celebrant note entered yet for this celebration.
+            </div>
+          `}
+        </div>
+
+        <button class="btn btn-primary" onclick="chaplainApp.openChaplainNotesModal('${mass.id}')">
+          ✏️ Edit Celebrant Note
+        </button>
+      </div>
+    `;
   }
 
-  // --- Chaplain Liturgical Notes Modal ---
-  openChaplainNotesModal(massId) {
-    const mass = store.getMassById(massId);
-    if (!mass) return;
-
-    const modal = document.getElementById('chaplain-notes-modal');
-    if (!modal) return;
-
-    document.getElementById('chaplain-notes-mass-id').value = mass.id;
-    document.getElementById('chaplain-notes-mass-theme').textContent = `Mass: ${mass.theme} (${mass.displayDate || mass.date})`;
-    document.getElementById('chaplain-notes-text').value = mass.chaplainNotes || '';
-
-    modal.classList.add('active');
-  }
-
-  closeChaplainNotesModal() {
-    const modal = document.getElementById('chaplain-notes-modal');
-    if (modal) modal.classList.remove('active');
-  }
-
-  handleSaveChaplainNotes(e) {
-    e.preventDefault();
-    const massId = document.getElementById('chaplain-notes-mass-id')?.value;
-    const notes = document.getElementById('chaplain-notes-text')?.value.trim();
-
-    store.updateMassChaplainNotes(massId, notes);
-    this.closeChaplainNotesModal();
-    this.showToast('Celebrant liturgical instructions saved and communicated to music group.', 'success');
-    this.render();
-  }
-
-  // --- Chaplain Pastoral Endorsement Modal ---
+  // Modals
   openChaplainEndorseModal(massId) {
     const mass = store.getMassById(massId);
     if (!mass) return;
 
-    const modal = document.getElementById('chaplain-endorse-modal');
-    if (!modal) return;
-
-    document.getElementById('chaplain-endorse-mass-id').value = mass.id;
-    document.getElementById('chaplain-endorse-mass-title').textContent = `${mass.theme} • ${mass.displayDate || mass.date} • ${mass.venue}`;
-
-    modal.classList.add('active');
+    if (confirm(`Grant pastoral blessing and final celebrant approval for "${mass.theme}" (${mass.displayDate})?`)) {
+      store.endorseMassByChaplain(massId, 'Fr. Emmanuel K. Aidoo');
+      alert(`✝️ Pastoral Blessing Granted for ${mass.theme}!`);
+      this.render();
+    }
   }
 
-  closeChaplainEndorseModal() {
-    const modal = document.getElementById('chaplain-endorse-modal');
-    if (modal) modal.classList.remove('active');
-  }
+  openChaplainNotesModal(massId) {
+    const mass = store.getMassById(massId);
+    if (!mass) return;
 
-  confirmChaplainEndorsement() {
-    const massId = document.getElementById('chaplain-endorse-mass-id')?.value;
-    const currentUser = store.getCurrentUser();
-    const chaplainName = currentUser.name || 'Fr. Emmanuel K. Aidoo (Chaplain)';
-
-    store.endorseMassArrangement(massId, 'Pastoral Blessing and Liturgical Endorsement granted.', chaplainName);
-    this.closeChaplainEndorseModal();
-    this.showToast('✝️ Pastoral Blessing and Liturgical Endorsement granted!', 'success');
-    this.render();
+    const currentNote = mass.chaplainNotes || 'Please ensure the Responsorial Psalm tone is sung meditatively and without rush. Communion hymn must extend through the post-communion reflection.';
+    const note = prompt('Enter Celebrant Directives to the Choir Director:', currentNote);
+    if (note !== null) {
+      store.updateChaplainNotes(massId, note);
+      this.render();
+    }
   }
 
   printCurrentProgramme() {
     window.print();
   }
-
-  showToast(message, type = 'info') {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-
-    const toast = document.createElement('div');
-    toast.className = 'toast-msg';
-    const icon = type === 'success' ? '✅' : 'ℹ️';
-    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
-
-    container.appendChild(toast);
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transition = 'all 0.25s ease';
-      setTimeout(() => toast.remove(), 250);
-    }, 3200);
-  }
 }
 
-let chaplainApp;
-document.addEventListener('DOMContentLoaded', () => {
-  chaplainApp = new ChaplainDashboardController();
-});
+// Global instance
+const chaplainApp = new ChaplainDashboardController();
