@@ -228,6 +228,10 @@ class SMMMSApp {
     if (!container) return;
 
     const currentUser = store.getCurrentUser();
+    const masses = store.getMasses();
+    const activeMass = masses.find(m => m.date >= '2025-05-25') || masses[0];
+    const seasonClass = `liturgical-theme-${activeMass.season || 'easter'}`;
+    container.className = seasonClass;
 
     // 1. If user is Pending Approval, show Security Lock Gate
     if (currentUser.status === 'pending') {
@@ -255,6 +259,102 @@ class SMMMSApp {
   }
 
   // ----------------------------------------------------
+  // ROLE-CONTEXTUAL QUICK ACTIONS RIBBON
+  // ----------------------------------------------------
+  renderRoleQuickActionsRibbon(user) {
+    if (user.role === 'chaplain') {
+      return `
+        <div class="role-quick-ribbon">
+          <div class="quick-ribbon-title">
+            <span>✝️</span> <span>Chaplaincy Quick Actions</span>
+          </div>
+          <div class="quick-ribbon-actions">
+            <button class="quick-action-chip chip-primary" onclick="app.navigateTo('schedule')">
+              📖 Sunday Lectionary Readings
+            </button>
+            <button class="quick-action-chip" onclick="app.openChaplainNotesModal('mass-2025-05-25')">
+              ✍️ Send Note to Choir
+            </button>
+            <button class="quick-action-chip chip-green" onclick="app.openChaplainEndorseModal('mass-2025-05-25')">
+              ✝️ Grant Pastoral Blessing
+            </button>
+            <button class="quick-action-chip" onclick="app.printCurrentProgramme()">
+              🖨️ Print Leaflet
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (user.role === 'coordinator') {
+      return `
+        <div class="role-quick-ribbon">
+          <div class="quick-ribbon-title">
+            <span>📋</span> <span>Music Direction Quick Actions</span>
+          </div>
+          <div class="quick-ribbon-actions">
+            <button class="quick-action-chip chip-primary" onclick="app.openCreateMassModal()">
+              ➕ Schedule Mass & Assign Choir
+            </button>
+            <button class="quick-action-chip" onclick="app.navigateTo('approvals')">
+              📋 Review Submissions Queue
+            </button>
+            <button class="quick-action-chip" onclick="app.openAddSongModal()">
+              🎵 Add Hymn to Library
+            </button>
+            <button class="quick-action-chip" onclick="app.navigateTo('groups')">
+              👥 Choir Roster Matrix
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (user.role === 'admin') {
+      return `
+        <div class="role-quick-ribbon">
+          <div class="quick-ribbon-title">
+            <span>🛡️</span> <span>Administrator Quick Actions</span>
+          </div>
+          <div class="quick-ribbon-actions">
+            <button class="quick-action-chip chip-primary" onclick="app.navigateTo('users')">
+              👥 Manage All Accounts
+            </button>
+            <button class="quick-action-chip chip-green" onclick="app.batchApproveAllPending()">
+              ⚡ Batch Approve Verified Users
+            </button>
+            <button class="quick-action-chip" onclick="app.openRegisterUserModal()">
+              ➕ Register New User
+            </button>
+            <button class="quick-action-chip" onclick="app.navigateTo('settings')">
+              ⚙️ System Settings
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      // Music Group Member
+      return `
+        <div class="role-quick-ribbon">
+          <div class="quick-ribbon-title">
+            <span>🎵</span> <span>Chorister Quick Actions</span>
+          </div>
+          <div class="quick-ribbon-actions">
+            <button class="quick-action-chip chip-primary" onclick="app.navigateTo('arrangement')">
+              🎼 Open 13-Part Mass Editor
+            </button>
+            <button class="quick-action-chip" onclick="audioSynth.playPitchTone('G4')">
+              🔊 Sound G4 Pitch
+            </button>
+            <button class="quick-action-chip" onclick="app.openChordModal('song-easter-1')">
+              🎸 Transpose Chords
+            </button>
+            <button class="quick-action-chip" onclick="app.copyWhatsAppSummary(app.activeArrangementId)">
+              📱 Copy WhatsApp Summary
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // ----------------------------------------------------
   // DASHBOARD 1: PENDING APPROVAL SECURITY LOCK GATE
   // ----------------------------------------------------
   renderPendingApprovalGate(user) {
@@ -264,18 +364,27 @@ class SMMMSApp {
           <div class="pending-lock-shield">🔒</div>
           <h2 class="pending-lock-title">Account Pending Administrator Approval</h2>
           <p class="pending-lock-subtitle">
-            In accordance with OLAG SHS Chaplaincy policy, new accounts for Priests, Music Coordinators, and Music Group Members must be individually verified and approved by the Administrator before accessing the app.
+            Welcome to Our Lady of Grace Senior High School (OLAG) Mass Music Management System. All accounts require individual verification and clearance from the Administrator before access is unlocked.
           </p>
         </div>
 
         <div class="pending-lock-body">
-          <div class="pending-step-indicator">
-            <span style="font-size: 1.25rem;">⏳</span>
-            <div>
-              <strong>Current Status: Awaiting Admin Verification</strong>
-              <div style="font-size: 0.78rem; opacity: 0.9; margin-top: 2px;">
-                Your registration was submitted on <strong>${user.registeredDate || 'May 24, 2025'}</strong>. Once approved, all Mass arrangements, songs, and schedules will unlock immediately.
-              </div>
+          <!-- 3-Step Approval Timeline -->
+          <div class="approval-timeline-3step">
+            <div class="timeline-step-box step-complete">
+              <div class="timeline-step-num">Step 1</div>
+              <div class="timeline-step-name">Registered ✅</div>
+              <div style="font-size: 0.68rem; margin-top: 3px;">${user.registeredDate || 'May 2025'}</div>
+            </div>
+            <div class="timeline-step-box step-current">
+              <div class="timeline-step-num">Step 2</div>
+              <div class="timeline-step-name">Under Review ⏳</div>
+              <div style="font-size: 0.68rem; margin-top: 3px;">Chaplaincy Office</div>
+            </div>
+            <div class="timeline-step-box step-locked">
+              <div class="timeline-step-num">Step 3</div>
+              <div class="timeline-step-name">Access Granted 🔒</div>
+              <div style="font-size: 0.68rem; margin-top: 3px;">Full System Access</div>
             </div>
           </div>
 
@@ -285,7 +394,7 @@ class SMMMSApp {
                 <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${user.name}</h4>
                 <div style="font-size: 0.8rem; color: var(--text-muted);">${user.email}</div>
               </div>
-              <span class="badge-pill badge-orange" style="font-size: 0.75rem;">Status: Pending Review ⏳</span>
+              <span class="badge-pill badge-orange" style="font-size: 0.75rem;">Status: Awaiting Verification ⏳</span>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.82rem; margin-top: 0.5rem;">
@@ -325,9 +434,14 @@ class SMMMSApp {
     const nextCelebration = myMasses.find(m => m.date >= '2025-05-25') || myMasses[0] || masses[0];
     const endorsedCount = masses.filter(m => m.chaplainEndorsed).length;
     const pendingEndorseCount = masses.filter(m => !m.chaplainEndorsed && m.status === 'approved').length;
+    const targetArr = store.getArrangementById(nextCelebration.arrangementId) || arrangements[0];
+    const songs = targetArr?.songs || {};
 
     return `
-      <!-- Chaplain Hero Identity Banner -->
+      <!-- Quick Actions Ribbon -->
+      ${this.renderRoleQuickActionsRibbon(user)}
+
+      <!-- Chaplain Hero Identity Banner with Dynamic Liturgical Season -->
       <div class="role-hero-banner banner-chaplain">
         <div>
           <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">
@@ -335,7 +449,7 @@ class SMMMSApp {
           </span>
           <h1 class="role-hero-title">Pax Christi, ${user.name} 👋</h1>
           <p class="role-hero-subtitle">
-            School Chaplain & Priest Celebrant &bull; Oversee Mass Scripture Readings, review music programmes, and grant pastoral liturgical blessings.
+            School Chaplain & Priest Celebrant &bull; Verify Lectionary scripture readings, review hymn theological harmony, and grant pastoral liturgical blessings.
           </p>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -387,117 +501,130 @@ class SMMMSApp {
         </div>
       </div>
 
-      <!-- 2 Major Panels Row -->
-      <div class="dash-panels-row">
-        <!-- Left: Celebrant's Upcoming Liturgies & Readings -->
-        <div class="dash-panel-card">
-          <div class="panel-header-row">
-            <h3 class="panel-header-title">Celebrant's Upcoming Liturgies & Readings</h3>
-            <a class="panel-link-action" onclick="app.navigateTo('schedule')">Full Schedule</a>
+      <!-- Centerpiece Widget: Side-by-Side Scripture & Hymn Theological Alignment -->
+      <div class="dash-panel-card" style="margin-bottom: 1.5rem;">
+        <div class="panel-header-row">
+          <div>
+            <h3 class="panel-header-title">📖 Sunday Lectionary Readings & Hymn Theological Alignment</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">
+              ${nextCelebration.theme} &bull; ${nextCelebration.displayDate || nextCelebration.date} &bull; St. Thomas Aquinas Chapel
+            </span>
           </div>
-
-          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-            ${masses.slice(0, 3).map(m => {
-              const group = store.getGroupById(m.assignedGroupId);
-              return `
-                <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.95rem;">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.4rem;">
-                    <div>
-                      <h4 style="font-size: 0.98rem; font-weight: 800; color: var(--text-main);">${m.theme}</h4>
-                      <div style="font-size: 0.78rem; color: var(--text-muted);">
-                        📅 ${m.displayDate || m.date} &bull; ⏰ ${m.time} &bull; 🏛️ ${m.venue}
-                      </div>
-                    </div>
-                    <div style="display: flex; gap: 0.35rem; align-items: center;">
-                      <span class="vestment-tag">${m.vestmentIcon || '⚪'} ${m.vestment || 'White'}</span>
-                      ${m.chaplainEndorsed ? `
-                        <span class="pastoral-endorsement-badge">✝️ Pastoral Blessing Granted</span>
-                      ` : `
-                        <button class="btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: #10b981; border-color: #10b981;" onclick="app.openChaplainEndorseModal('${m.id}')">
-                          ✝️ Endorse
-                        </button>
-                      `}
-                    </div>
-                  </div>
-
-                  <!-- Scripture Readings -->
-                  <div class="readings-box-strip">
-                    📖 <strong>Liturgical Readings:</strong> ${m.readings || 'Proper readings for the Sunday'}
-                  </div>
-
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; font-size: 0.78rem;">
-                    <div>👥 <strong>Music Group:</strong> ${group ? group.name : 'School Choir'}</div>
-                    <button class="btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;" onclick="app.openChaplainNotesModal('${m.id}')">
-                      ✍️ Celebrant Instructions
-                    </button>
-                  </div>
-
-                  ${m.chaplainNotes ? `
-                    <div style="margin-top: 0.45rem; font-size: 0.75rem; color: #b45309; background: #fef3c7; padding: 0.35rem 0.65rem; border-radius: 4px;">
-                      💬 <strong>Celebrant Note to Choir:</strong> "${m.chaplainNotes}"
-                    </div>
-                  ` : ''}
-                </div>
-              `;
-            }).join('')}
+          <div style="display: flex; gap: 0.5rem;">
+            ${nextCelebration.chaplainEndorsed ? `
+              <span class="pastoral-endorsement-badge">✝️ Pastoral Blessing Granted</span>
+            ` : `
+              <button class="btn-primary" style="font-size: 0.75rem; background: #10b981; border-color: #10b981;" onclick="app.openChaplainEndorseModal('${nextCelebration.id}')">
+                ✝️ Grant Pastoral Blessing
+              </button>
+            `}
+            <button class="btn-outline" style="font-size: 0.75rem;" onclick="app.openChaplainNotesModal('${nextCelebration.id}')">
+              ✍️ Celebrant Note
+            </button>
           </div>
         </div>
 
-        <!-- Right: Today's High Mass Liturgical Arrangement Review -->
-        <div class="dash-panel-card">
-          <div class="panel-header-row">
-            <h3 class="panel-header-title">Music Programme Liturgical Review</h3>
-            <a class="panel-link-action" onclick="app.navigateTo('arrangement')">View All 13 Parts</a>
-          </div>
+        <div class="scripture-hymn-split">
+          <!-- Left: Lectionary Readings (Year C) -->
+          <div class="scripture-column">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <strong style="font-size: 0.88rem; color: var(--text-main);">📜 Holy Scripture Readings (Lectionary)</strong>
+              <span class="badge-pill badge-blue" style="font-size: 0.68rem;">Year C</span>
+            </div>
 
-          <div style="background: var(--bg-surface-subtle); padding: 0.85rem; border-radius: var(--radius-md); margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <strong style="font-size: 0.88rem; color: var(--text-main);">${nextCelebration.theme}</strong>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">${nextCelebration.displayDate || nextCelebration.date} &bull; School Choir</div>
+            <div class="scripture-reading-item">
+              <div style="font-size: 0.72rem; font-weight: 700; color: #2563eb; text-transform: uppercase;">First Reading</div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">Acts 10:34a, 37-43</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">
+                "Peter proceeded to speak and said: 'You know what has happened all over Judea... He commissioned us to preach to the people and testify that he is the one appointed by God as judge of the living and the dead.'"
+              </div>
             </div>
-            <span class="badge-pill badge-green">Coordinator Approved</span>
-          </div>
 
-          <div class="arrangement-preview-list">
-            <div class="preview-part-row">
-              <span class="part-name-label">1. Entrance</span>
-              <span class="part-song-label">Christ the Lord Is Risen Today</span>
-              <span class="part-performer-label">G &bull; 4/4</span>
+            <div class="scripture-reading-item" style="border-left-color: #10b981;">
+              <div style="font-size: 0.72rem; font-weight: 700; color: #10b981; text-transform: uppercase;">Responsorial Psalm</div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">Psalm 118: 1-2, 16-17, 22-23</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">
+                <strong>Response:</strong> <em>"This is the day the Lord has made; let us rejoice and be glad in it."</em>
+              </div>
             </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">2. Penitential Rite</span>
-              <span class="part-song-label">Lord, Have Mercy (Kyrie)</span>
-              <span class="part-performer-label">D &bull; 4/4</span>
+
+            <div class="scripture-reading-item" style="border-left-color: #8b5cf6;">
+              <div style="font-size: 0.72rem; font-weight: 700; color: #8b5cf6; text-transform: uppercase;">Second Reading</div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">Colossians 3:1-4</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">
+                "Brothers and sisters: If then you were raised with Christ, seek what is above, where Christ is seated at the right hand of God."
+              </div>
             </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">3. Gloria</span>
-              <span class="part-song-label">Glory to God in the Highest</span>
-              <span class="part-performer-label">D &bull; 4/4</span>
-            </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">4. Responsorial Psalm</span>
-              <span class="part-song-label">Psalm 118: This Is the Day</span>
-              <span class="part-performer-label">G &bull; Cantor</span>
-            </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">7. Sanctus</span>
-              <span class="part-song-label">Holy, Holy, Holy (Missa de Angelis)</span>
-              <span class="part-performer-label">F &bull; SATB</span>
-            </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">11. Communion</span>
-              <span class="part-song-label">I Am the Bread of Life</span>
-              <span class="part-performer-label">G &bull; 4/4</span>
+
+            <div class="scripture-reading-item" style="border-left-color: #dc2626;">
+              <div style="font-size: 0.72rem; font-weight: 700; color: #dc2626; text-transform: uppercase;">Holy Gospel</div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">John 20:1-9</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">
+                "On the first day of the week, Mary of Magdala came to the tomb early in the morning, while it was still dark, and saw the stone removed from the tomb."
+              </div>
             </div>
           </div>
 
-          <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-            <button class="btn-primary" style="flex: 1; font-size: 0.78rem;" onclick="app.navigateTo('arrangement')">
-              Inspect All 13 Parts &rarr;
-            </button>
-            <button class="btn-outline" style="font-size: 0.78rem;" onclick="app.printCurrentProgramme()">
-              🖨️ Print Leaflet
-            </button>
+          <!-- Right: Choir Hymns Selected (Theological Match) -->
+          <div class="hymn-column">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <strong style="font-size: 0.88rem; color: var(--text-main);">🎵 Choir Selected Hymns</strong>
+              <span class="badge-pill badge-green" style="font-size: 0.68rem;">School Choir</span>
+            </div>
+
+            <div class="hymn-align-row">
+              <div>
+                <div style="font-size: 0.7rem; font-weight: 700; color: #2563eb;">1. Entrance Hymn</div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.entrance?.title || 'Christ the Lord Is Risen Today'}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">Theological Theme: Resurrection Proclamation</div>
+              </div>
+              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Conforms ✅</span>
+            </div>
+
+            <div class="hymn-align-row">
+              <div>
+                <div style="font-size: 0.7rem; font-weight: 700; color: #10b981;">4. Responsorial Psalm</div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.psalm?.title || 'Psalm 118: This Is the Day'}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">Matches Lectionary Response exact text</div>
+              </div>
+              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Direct Match ✅</span>
+            </div>
+
+            <div class="hymn-align-row">
+              <div>
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8b5cf6;">6. Offertory Hymn</div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.offertory?.title || 'Take Our Bread'}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">Sacrificial Presentation of Gifts</div>
+              </div>
+              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Conforms ✅</span>
+            </div>
+
+            <div class="hymn-align-row">
+              <div>
+                <div style="font-size: 0.7rem; font-weight: 700; color: #dc2626;">11. Communion Hymn</div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.communion?.title || 'I Am the Bread of Life'}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">Eucharistic Solemnity & Reverence</div>
+              </div>
+              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Conforms ✅</span>
+            </div>
+
+            <div class="hymn-align-row">
+              <div>
+                <div style="font-size: 0.7rem; font-weight: 700; color: #d97706;">13. Recessional Hymn</div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${songs.recessional?.title || 'Sing with All the Saints in Glory'}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">Easter Mission Sending Forth</div>
+              </div>
+              <span class="badge-pill badge-green" style="font-size: 0.65rem;">Conforms ✅</span>
+            </div>
+
+            <div style="margin-top: 0.85rem; display: flex; gap: 0.5rem;">
+              <button class="btn-primary" style="flex: 1; font-size: 0.75rem;" onclick="app.navigateTo('arrangement')">
+                Inspect Full 13-Part Score &rarr;
+              </button>
+              <button class="btn-outline" style="font-size: 0.75rem;" onclick="app.printCurrentProgramme()">
+                🖨️ Print Order of Service
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -506,7 +633,7 @@ class SMMMSApp {
       <div class="reminder-banner">
         <span style="font-size: 1.1rem;">✝️</span>
         <span>
-          <strong>Pastoral Reminder:</strong> Sacred music in the Catholic liturgy serves the glory of God and the sanctification of the faithful. Ensure all chosen texts are rooted in Holy Scripture and liturgical tradition.
+          <strong>Pastoral Guidance for Liturgical Music:</strong> Sacred music in the Catholic liturgy serves the glory of God and the sanctification of the faithful. Ensure all chosen texts are rooted in Holy Scripture and liturgical tradition.
         </span>
       </div>
     `;
@@ -522,6 +649,9 @@ class SMMMSApp {
     const pendingArrangements = arrangements.filter(a => a.status === 'submitted');
 
     return `
+      <!-- Quick Actions Ribbon -->
+      ${this.renderRoleQuickActionsRibbon(user)}
+
       <!-- Coordinator Hero Identity Banner -->
       <div class="role-hero-banner banner-coordinator">
         <div>
@@ -582,12 +712,107 @@ class SMMMSApp {
         </div>
       </div>
 
-      <!-- 2 Major Panels Row -->
+      <!-- Centerpiece Widget: 5-Stage Liturgical Approval Pipeline Board -->
+      <div class="dash-panel-card" style="margin-bottom: 1.5rem;">
+        <div class="panel-header-row">
+          <div>
+            <h3 class="panel-header-title">📊 Liturgical Mass Music Pipeline Board</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">
+              Track progress from initial Mass creation to final Chaplain blessing across all school choirs.
+            </span>
+          </div>
+          <button class="btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.openCreateMassModal()">
+            ➕ Schedule New Mass
+          </button>
+        </div>
+
+        <div class="pipeline-board">
+          <!-- Stage 1: Mass Created -->
+          <div class="pipeline-col">
+            <div class="pipeline-stage-header">
+              <span class="pipeline-stage-title">1. Scheduled</span>
+              <span class="badge-pill badge-blue" style="font-size: 0.65rem;">1</span>
+            </div>
+            <div class="pipeline-card" onclick="app.openMassDetailsModal('mass-2025-06-22')">
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">Feast of Corpus Christi</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Sun, 22 Jun &bull; Chapel Choir</div>
+              <div style="margin-top: 6px;">
+                <span class="badge-pill badge-gray" style="font-size: 0.62rem;">Choir Notified</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 2: Drafting 0-12/13 -->
+          <div class="pipeline-col">
+            <div class="pipeline-stage-header">
+              <span class="pipeline-stage-title">2. Drafting</span>
+              <span class="badge-pill badge-orange" style="font-size: 0.65rem;">1</span>
+            </div>
+            <div class="pipeline-card" onclick="app.openMassDetailsModal('mass-2025-06-15')">
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">Trinity Sunday</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Sun, 15 Jun &bull; Inspirational Band</div>
+              <div style="margin-top: 6px;">
+                <span class="badge-pill badge-orange" style="font-size: 0.62rem;">8 of 13 Selected</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 3: Submitted (13/13) -->
+          <div class="pipeline-col" style="border-color: #fdba74; background: #fffaf5;">
+            <div class="pipeline-stage-header">
+              <span class="pipeline-stage-title" style="color: #ea580c;">3. Review Queue</span>
+              <span class="badge-pill badge-orange" style="font-size: 0.65rem;">${pendingArrangements.length}</span>
+            </div>
+            ${pendingArrangements.map(arr => `
+              <div class="pipeline-card" style="border-left: 3px solid #ea580c;" onclick="app.coordinatorApprove('${arr.id}')">
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">${arr.massTitle}</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">${arr.groupName}</div>
+                <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+                  <span class="badge-pill badge-orange" style="font-size: 0.62rem;">13 Parts Ready</span>
+                  <span style="font-size: 0.7rem; color: #2563eb; font-weight: 700;">Review &rarr;</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Stage 4: Reviewed & Corrected -->
+          <div class="pipeline-col">
+            <div class="pipeline-stage-header">
+              <span class="pipeline-stage-title">4. Approved</span>
+              <span class="badge-pill badge-green" style="font-size: 0.65rem;">1</span>
+            </div>
+            <div class="pipeline-card" onclick="app.openMassDetailsModal('mass-2025-05-25')">
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">Easter Sunday Mass</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Sun, 25 May &bull; School Choir</div>
+              <div style="margin-top: 6px;">
+                <span class="badge-pill badge-green" style="font-size: 0.62rem;">Approved by Coordinator</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 5: Chaplain Blessed -->
+          <div class="pipeline-col" style="border-color: #86efac; background: #f0fdf4;">
+            <div class="pipeline-stage-header">
+              <span class="pipeline-stage-title" style="color: #15803d;">5. Blessed</span>
+              <span class="badge-pill badge-green" style="font-size: 0.65rem;">1</span>
+            </div>
+            <div class="pipeline-card" style="border-left: 3px solid #10b981;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">Easter Vigil High Mass</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Combined Choirs</div>
+              <div style="margin-top: 6px;">
+                <span class="pastoral-endorsement-badge" style="font-size: 0.62rem;">✝️ Pastoral Blessing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 Panels Row: Review Queue & Assignment Matrix -->
       <div class="dash-panels-row">
         <!-- Left: Urgent Arrangement Review & Approvals Queue -->
         <div class="dash-panel-card">
           <div class="panel-header-row">
-            <h3 class="panel-header-title">Arrangements Awaiting Coordinator Review (${pendingArrangements.length})</h3>
+            <h3 class="panel-header-title">Submissions Awaiting Coordinator Review (${pendingArrangements.length})</h3>
             <a class="panel-link-action" onclick="app.navigateTo('approvals')">Open Approval Hub</a>
           </div>
 
@@ -675,8 +900,12 @@ class SMMMSApp {
     const assignedMasses = masses.filter(m => m.assignedGroupId === myGroupId);
     const nextMass = assignedMasses.find(m => m.date >= '2025-05-25') || assignedMasses[0] || masses[0];
     const targetArr = nextMass ? store.getArrangementById(nextMass.arrangementId) : arrangements[0];
+    const songs = targetArr?.songs || {};
 
     return `
+      <!-- Quick Actions Ribbon -->
+      ${this.renderRoleQuickActionsRibbon(user)}
+
       <!-- Musician Hero Identity Banner -->
       <div class="role-hero-banner banner-group">
         <div>
@@ -685,7 +914,7 @@ class SMMMSApp {
           </span>
           <h1 class="role-hero-title">Good day, ${user.name}! 👋</h1>
           <p class="role-hero-subtitle">
-            ${myGroup ? myGroup.name : 'School Choir'} &bull; ${user.voicePart || 'Soprano Section'} &bull; Enter your 13 Mass parts, verify pitch, and review transposable chords.
+            ${myGroup ? myGroup.name : 'School Choir'} &bull; ${user.voicePart || 'Soprano Section'} &bull; Rehearse your 13 Mass parts, sound pitch tones, and prepare lead sheets.
           </p>
         </div>
         <div>
@@ -734,13 +963,64 @@ class SMMMSApp {
         </div>
       </div>
 
-      <!-- 2 Major Panels Row -->
+      <!-- Centerpiece Widget: Interactive 13-Part Rehearsal Prep Card -->
+      <div class="dash-panel-card" style="margin-bottom: 1.5rem;">
+        <div class="panel-header-row">
+          <div>
+            <h3 class="panel-header-title">🎵 13-Part Mass Rehearsal & Pitch Practice Card</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">
+              ${nextMass ? nextMass.theme : 'Easter Sunday'} &bull; Click any hymn's pitch badge to sound its key tone before singing.
+            </span>
+          </div>
+          <button class="btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.navigateTo('arrangement')">
+            Open Arrangement Editor &rarr;
+          </button>
+        </div>
+
+        <!-- 13-Part Progress Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.25rem;">
+          <span>Mass Parts Preparation Progress</span>
+          <span style="color: #10b981;">13 of 13 Parts Complete (100%)</span>
+        </div>
+        <div class="prep-progress-bar-wrap">
+          <div class="prep-progress-bar-fill" style="width: 100%;"></div>
+        </div>
+
+        <!-- 13 Mass Parts List with Embedded Web Audio Pitch Triggers -->
+        <div style="display: flex; flex-direction: column; gap: 0.45rem;">
+          ${MASS_PARTS.map(part => {
+            const s = songs[part.id] || { title: 'Assigned', key: 'G', tempo: 120 };
+            return `
+              <div class="prep-part-item">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <span style="font-size: 0.75rem; font-weight: 800; color: #2563eb; width: 22px;">${part.order}.</span>
+                  <div>
+                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">${part.name}</div>
+                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main);">${s.title}</div>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <button class="pitch-trigger-tag" onclick="audioSynth.playPitchTone('${s.key || 'G'}4')" title="Sound Key ${s.key || 'G'} pitch pipe tone">
+                    🔊 Key ${s.key || 'G'}
+                  </button>
+                  <button class="btn-outline" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="app.openChordModal('${s.songId || 'song-easter-1'}', '${part.id}')" title="View transposable chords">
+                    🎸 Chords
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- 2 Panels Row: Next Mass Summary & Musician Audio Synthesizer -->
       <div class="dash-panels-row">
-        <!-- Left: My Group's Mass Arrangement & 13 Parts -->
+        <!-- Left: Next Mass Summary -->
         <div class="dash-panel-card">
           <div class="panel-header-row">
-            <h3 class="panel-header-title">My Choir's Next Mass Arrangement</h3>
-            <a class="panel-link-action" onclick="app.navigateTo('arrangement')">Edit Full Arrangement</a>
+            <h3 class="panel-header-title">Next Celebration Overview</h3>
+            <a class="panel-link-action" onclick="app.navigateTo('schedule')">Full Calendar</a>
           </div>
 
           <div class="next-mass-content" style="margin-bottom: 1rem;">
@@ -760,36 +1040,7 @@ class SMMMSApp {
             </div>
           </div>
 
-          <!-- 5-Part Preview -->
-          <div class="arrangement-preview-list">
-            <div class="preview-part-row">
-              <span class="part-name-label">1. Entrance</span>
-              <span class="part-song-label">Christ the Lord Is Risen Today</span>
-              <span class="part-performer-label">Key G &bull; 120 BPM</span>
-            </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">2. Penitential Rite</span>
-              <span class="part-song-label">Lord, Have Mercy (Kyrie)</span>
-              <span class="part-performer-label">Key D &bull; 100 BPM</span>
-            </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">3. Gloria</span>
-              <span class="part-song-label">Glory to God in the Highest</span>
-              <span class="part-performer-label">Key D &bull; SATB</span>
-            </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">4. Responsorial Psalm</span>
-              <span class="part-song-label">Psalm 118: This Is the Day</span>
-              <span class="part-performer-label">Key G &bull; Cantor</span>
-            </div>
-            <div class="preview-part-row">
-              <span class="part-name-label">11. Communion</span>
-              <span class="part-song-label">I Am the Bread of Life</span>
-              <span class="part-performer-label">Key G &bull; 96 BPM</span>
-            </div>
-          </div>
-
-          <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <button class="btn-primary" onclick="app.navigateTo('arrangement')">
               Open 13-Part Editor &rarr;
             </button>
@@ -799,7 +1050,7 @@ class SMMMSApp {
           </div>
         </div>
 
-        <!-- Right: Choir Loft Musician Toolkit -->
+        <!-- Right: Choir Loft Pitch Synthesizer -->
         <div class="dash-panel-card">
           <div class="panel-header-row">
             <h3 class="panel-header-title">Choir Loft Musician Toolkit</h3>
@@ -860,6 +1111,9 @@ class SMMMSApp {
     const masses = store.getMasses();
 
     return `
+      <!-- Quick Actions Ribbon -->
+      ${this.renderRoleQuickActionsRibbon(user)}
+
       <!-- Admin Hero Identity Banner -->
       <div class="role-hero-banner banner-admin">
         <div>
@@ -920,43 +1174,53 @@ class SMMMSApp {
         </div>
       </div>
 
-      <!-- User Approvals Action Panel -->
+      <!-- Centerpiece Widget: Quick-Triage Action Cards for Pending Users -->
       <div class="dash-panel-card" style="margin-bottom: 1.5rem;">
         <div class="panel-header-row">
           <div>
-            <h3 class="panel-header-title">Pending User Approval Queue (${pendingUsers.length})</h3>
+            <h3 class="panel-header-title">🛡️ Pending User Approval Queue (${pendingUsers.length})</h3>
             <span style="font-size: 0.78rem; color: var(--text-muted);">
-              These accounts are currently locked and cannot access the app until you click Approve.
+              All new users are locked out of the app until individually approved by the Administrator below.
             </span>
           </div>
-          <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.navigateTo('users')">
-            Manage All Accounts &rarr;
-          </button>
+          <div style="display: flex; gap: 0.5rem;">
+            ${pendingUsers.length > 0 ? `
+              <button class="btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; background: #10b981; border-color: #10b981;" onclick="app.batchApproveAllPending()">
+                ⚡ Batch Approve All (${pendingUsers.length})
+              </button>
+            ` : ''}
+            <button class="btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;" onclick="app.navigateTo('users')">
+              Manage All Accounts &rarr;
+            </button>
+          </div>
         </div>
 
         ${pendingUsers.length === 0 ? `
           <div style="padding: 2rem; text-align: center; color: var(--text-muted); background: var(--bg-surface-subtle); border-radius: var(--radius-md);">
             <span style="font-size: 2rem;">🎉</span>
-            <p style="margin-top: 0.5rem; font-size: 0.88rem;">All user registrations have been reviewed and approved!</p>
+            <p style="margin-top: 0.5rem; font-size: 0.88rem;">All user registrations have been verified and approved!</p>
           </div>
         ` : `
           <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             ${pendingUsers.map(u => `
               <div style="background: var(--bg-surface-subtle); border: 1px solid #fed7aa; border-radius: var(--radius-md); padding: 0.95rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-                <div>
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <strong style="font-size: 0.95rem; color: var(--text-main);">${u.name}</strong>
-                    <span class="badge-pill badge-orange" style="font-size: 0.7rem;">${u.roleLabel}</span>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <img src="${u.avatar || 'assets/avatar.jpg'}" alt="${u.name}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #ea580c;">
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <strong style="font-size: 0.95rem; color: var(--text-main);">${u.name}</strong>
+                      <span class="badge-pill badge-orange" style="font-size: 0.7rem;">${u.roleLabel}</span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                      ${u.email} &bull; Assigned: <strong>${u.groupName || 'Unassigned'}</strong> &bull; Voice/Role: ${u.voicePart || 'Member'}
+                    </div>
+                    ${u.notes ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px;">💬 "${u.notes}"</div>` : ''}
                   </div>
-                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-                    ${u.email} &bull; Assigned: <strong>${u.groupName || 'Unassigned'}</strong> &bull; Registered: ${u.registeredDate}
-                  </div>
-                  ${u.notes ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px;">💬 "${u.notes}"</div>` : ''}
                 </div>
 
                 <div style="display: flex; gap: 0.5rem;">
-                  <button class="btn-primary" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" onclick="app.approveUser('${u.id}')">
-                    ✅ Approve Account
+                  <button class="btn-primary" style="font-size: 0.78rem; padding: 0.35rem 0.75rem; background: #10b981; border-color: #10b981;" onclick="app.approveUser('${u.id}')">
+                    ✅ Approve & Unlock
                   </button>
                   <button class="btn-outline" style="font-size: 0.78rem; padding: 0.35rem 0.75rem; color: #dc2626; border-color: #fca5a5;" onclick="app.rejectUser('${u.id}')">
                     ❌ Reject
@@ -2128,6 +2392,21 @@ ${transposedChords}
       this.showToast(`Approved ${user.name} (${user.roleLabel}). Full application access is now unlocked!`, 'success');
       this.render();
     }
+  }
+
+  batchApproveAllPending() {
+    const users = store.getUsers();
+    const pendingUsers = users.filter(u => u.status === 'pending');
+    if (pendingUsers.length === 0) {
+      this.showToast('No pending user registrations in the queue.', 'info');
+      return;
+    }
+    const adminUser = store.getUserById('usr-admin') || { name: 'System Administrator' };
+    pendingUsers.forEach(u => {
+      store.approveUser(u.id, adminUser.name);
+    });
+    this.showToast(`Batch approved ${pendingUsers.length} pending user accounts successfully! Full access unlocked.`, 'success');
+    this.render();
   }
 
   rejectUser(userId) {

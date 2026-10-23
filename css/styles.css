@@ -1503,6 +1503,315 @@ html, body {
 }
 
 /* ==========================================================================
+   ENHANCED DASHBOARD DESIGN SYSTEM & LITURGICAL PALETTES
+   ========================================================================== */
+
+/* 1. Dynamic Liturgical Season Color Accents */
+.liturgical-theme-easter {
+  --season-accent: #f59e0b;
+  --season-bg-tint: rgba(245, 158, 11, 0.08);
+  --season-border: #fcd34d;
+}
+
+.liturgical-theme-lent {
+  --season-accent: #7c3aed;
+  --season-bg-tint: rgba(124, 58, 237, 0.08);
+  --season-border: #c4b5fd;
+}
+
+.liturgical-theme-ordinary {
+  --season-accent: #10b981;
+  --season-bg-tint: rgba(16, 185, 129, 0.08);
+  --season-border: #a7f3d0;
+}
+
+.liturgical-theme-solemnity {
+  --season-accent: #dc2626;
+  --season-bg-tint: rgba(220, 38, 38, 0.08);
+  --season-border: #fca5a5;
+}
+
+/* 2. Role-Contextual Quick Actions Ribbon */
+.role-quick-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+.quick-ribbon-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.quick-ribbon-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.quick-action-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+
+.quick-action-chip:hover {
+  background: #0b152d;
+  color: #ffffff;
+  border-color: #0b152d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.quick-action-chip.chip-primary {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.quick-action-chip.chip-primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.quick-action-chip.chip-green {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+.quick-action-chip.chip-green:hover {
+  background: #059669;
+  border-color: #059669;
+}
+
+/* 3. Scripture & Hymn Alignment Widget (Chaplain) */
+.scripture-hymn-split {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 1rem;
+  margin-top: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .scripture-hymn-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scripture-column, .hymn-column {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.95rem;
+}
+
+.scripture-reading-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.55rem;
+  border-left: 3px solid #2563eb;
+}
+
+.hymn-align-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.45rem;
+}
+
+/* 4. Interactive 5-Stage Approval Pipeline Board (Coordinator) */
+.pipeline-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+@media (max-width: 1100px) {
+  .pipeline-board {
+    grid-template-columns: repeat(5, minmax(200px, 1fr));
+  }
+}
+
+.pipeline-col {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  min-height: 220px;
+}
+
+.pipeline-stage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pipeline-stage-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.pipeline-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.pipeline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: #2563eb;
+}
+
+/* 5. 13-Part Rehearsal Prep Card (Music Group Member) */
+.prep-progress-bar-wrap {
+  width: 100%;
+  height: 8px;
+  background: var(--border-color);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0.5rem 0 1rem;
+}
+
+.prep-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.prep-part-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.45rem;
+  transition: background 0.15s ease;
+}
+
+.prep-part-item:hover {
+  background: var(--bg-surface);
+  border-color: #10b981;
+}
+
+.pitch-trigger-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pitch-trigger-tag:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+/* 6. 3-Step Approval Timeline (Pending Lock Screen) */
+.approval-timeline-3step {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 1.25rem 0 1.5rem;
+  position: relative;
+}
+
+.timeline-step-box {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  text-align: center;
+  position: relative;
+}
+
+.timeline-step-box.step-complete {
+  border-color: #10b981;
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.timeline-step-box.step-current {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.timeline-step-box.step-locked {
+  opacity: 0.6;
+}
+
+.timeline-step-num {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.2rem;
+}
+
+.timeline-step-name {
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+/* ==========================================================================
    PRINT STYLESHEET (LITURGICAL MASS PROGRAMME LEAFLET)
    ========================================================================== */
 @media print {
